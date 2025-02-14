@@ -1,12 +1,11 @@
-
+mod day;
+mod exercise;
+mod week;
+mod day_template;
+mod routine;
+mod error;
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
 }
