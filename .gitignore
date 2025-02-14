@@ -1,0 +1,5 @@
+/dist/
+/target/
+/Cargo.lock
+sqlite.db
+src-tauri/sqlite.db
