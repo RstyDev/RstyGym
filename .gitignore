@@ -3,3 +3,5 @@
 /Cargo.lock
 sqlite.db
 src-tauri/sqlite.db
+.env
+src-tauri/.env

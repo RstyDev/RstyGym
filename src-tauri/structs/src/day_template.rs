@@ -19,7 +19,7 @@ impl DayTemplate {
         &self.exercises
     }
     pub fn exercise_at(&self, index: usize) -> Res<&Exercise> {
-        if self.exercises.len() > &index {
+        if &self.exercises.len() > &index {
             Ok(&self.exercises[index])
         }else{
             Err(AppError::IndexErr)

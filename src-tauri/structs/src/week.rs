@@ -32,7 +32,7 @@ impl Week {
         &self.days
     }
     pub fn day_at(&self, index: usize) -> Res<&Day> {
-        if self.days.len() > &index {
+        if &self.days.len() > &index {
             Ok(&self.days[index])
         }else{
             Err(AppError::IndexErr)
@@ -41,8 +41,14 @@ impl Week {
     pub fn set_days(&mut self, days: [Day;6]) {
         self.days = days;
     }
+    pub fn set_day_at(&mut self, day: Day, index: usize) -> Res<()> {
+        if &self.days.len() > &index {
+            self.days[index] = day;
+            Ok(())
+        }else {Err(AppError::IndexErr)}
+    }
     pub fn day_at_mut(&mut self, index: usize) -> Res<&mut Day> {
-        if self.days.len() > &index {
+        if &self.days.len() > &index {
             Ok(&mut self.days[index])
         }else{
             Err(AppError::IndexErr)

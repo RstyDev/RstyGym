@@ -6,6 +6,10 @@ pub struct Exercise {
     id: i64,
     name: Rc<str>,
     series: Series,
+    group: MuscleGroup,
+}
+impl Exercise{
+
 }
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Series {

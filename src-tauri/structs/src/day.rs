@@ -51,7 +51,7 @@ impl Day {
         &self.exercises
     }
     pub fn exercise_at(&self, index: usize) -> Res<&Exercise> {
-        if self.exercises.len() > &index {
+        if &self.exercises.len() > &index {
             Ok(&self.exercises[index])
         }else{
             Err(AppError::IndexErr)
@@ -61,7 +61,7 @@ impl Day {
         &mut self.exercises
     }
     pub fn exercise_at_mut(&mut self, index: usize) -> Res<&mut Exercise> {
-        if self.exercises.len() > &index {
+        if &self.exercises.len() > &index {
             Ok(&mut self.exercises[index])
         }else{
             Err(AppError::IndexErr)
@@ -69,6 +69,12 @@ impl Day {
     }
     pub fn set_exercises(&mut self, exercises: Vec<Exercise>) {
         self.exercises = exercises;
+    }
+    pub fn set_exercise_at(&mut self, exercise: Exercise, index: usize) -> Res<()> {
+        if &self.exercises.len() > &index {
+            self.exercises[index] = exercise;
+            Ok(())
+        }else{Err(AppError::IndexErr)}
     }
 }
 
