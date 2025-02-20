@@ -8,5 +8,7 @@ pub enum AppError {
     #[error("Index out of bounds")]
     IndexErr,
     #[error("DB Error: {0}")]
-    DBErr(String)
+    DBErr(String),
+    #[error("Unknown state: {0}")]
+    UnknownState(String)
 }

@@ -21,4 +21,4 @@ features = ["Location", "Storage","KeyboardEvent"]
 version = "0.3.70"
 
 [dependencies.structs]
-path = "src-tauri/structs"
+path = "structs"

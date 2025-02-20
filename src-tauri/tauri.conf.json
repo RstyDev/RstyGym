@@ -13,7 +13,7 @@
     "windows": [
       {
         "title": "rstygym",
-        "width": 800,
+        "width": 300,
         "height": 600
       }
     ],

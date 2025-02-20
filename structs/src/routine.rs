@@ -1,21 +1,29 @@
-use std::rc::Rc;
+use crate::error::AppError;
+use crate::{day_template::DayTemplate, error::AppRes as Res, week::Week};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
-use crate::{day_template::DayTemplate, error::AppRes as Res, week::Week};
-use crate::error::AppError;
+use std::rc::Rc;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Routine {
     id: i64,
     templates: Vec<DayTemplate>,
-    weeks: [Week;4],
+    weeks: [Week; 4],
     last_check_in: NaiveDate,
     last_day_index: usize,
     created_by: Rc<str>,
     created_at: NaiveDate,
 }
 impl Routine {
-    pub fn build(id: Option<i64>, templates: Vec<DayTemplate>, weeks: [Week;4], last_check_in: Option<NaiveDate>, last_day_index: Option<usize>, created_by: Option<Rc<str>>, created_at: NaiveDate) -> Routine {
+    pub fn build(
+        id: Option<i64>,
+        templates: Vec<DayTemplate>,
+        weeks: [Week; 4],
+        last_check_in: Option<NaiveDate>,
+        last_day_index: Option<usize>,
+        created_by: Option<Rc<str>>,
+        created_at: NaiveDate,
+    ) -> Routine {
         Routine {
             id: id.unwrap_or_default(),
             templates,
@@ -32,34 +40,35 @@ impl Routine {
     pub fn template_at(&self, index: usize) -> Res<&DayTemplate> {
         if &self.templates.len() > &index {
             Ok(&self.templates[index])
-        }else{
+        } else {
             Err(AppError::IndexErr)
         }
-
     }
-    pub fn weeks(&self) -> &[Week;4] {
+    pub fn weeks(&self) -> &[Week; 4] {
         &self.weeks
     }
     pub fn week_at(&self, index: usize) -> Res<&Week> {
         if &self.weeks.len() > &index {
             Ok(&self.weeks[index])
-        }else{
+        } else {
             Err(AppError::IndexErr)
         }
     }
-    pub fn set_weeks(&mut self, weeks: [Week;4]) {
+    pub fn set_weeks(&mut self, weeks: [Week; 4]) {
         self.weeks = weeks;
     }
     pub fn set_week_at(&mut self, week: Week, index: usize) -> Res<()> {
         if &self.weeks.len() > &index {
             self.weeks[index] = week;
             Ok(())
-        }else{Err(AppError::IndexErr)}
+        } else {
+            Err(AppError::IndexErr)
+        }
     }
     pub fn week_at_mut(&mut self, index: usize) -> Res<&mut Week> {
         if &self.weeks.len() > &index {
             Ok(&mut self.weeks[index])
-        }else{
+        } else {
             Err(AppError::IndexErr)
         }
     }

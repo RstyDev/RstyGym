@@ -1,16 +1,19 @@
-use serde::{Deserialize, Serialize};
-use crate::{exercise::Exercise, error::AppRes as Res};
 use crate::error::AppError;
+use crate::{error::AppRes as Res, exercise::Exercise};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct DayTemplate {
     id: i64,
-    exercises: Vec<Exercise>
+    exercises: Vec<Exercise>,
 }
 
 impl DayTemplate {
     pub fn build(id: Option<i64>, exercises: Vec<Exercise>) -> DayTemplate {
-        DayTemplate { id: id.unwrap_or_default(), exercises }
+        DayTemplate {
+            id: id.unwrap_or_default(),
+            exercises,
+        }
     }
     pub fn id(&self) -> &i64 {
         &self.id
@@ -21,9 +24,8 @@ impl DayTemplate {
     pub fn exercise_at(&self, index: usize) -> Res<&Exercise> {
         if &self.exercises.len() > &index {
             Ok(&self.exercises[index])
-        }else{
+        } else {
             Err(AppError::IndexErr)
         }
-
     }
 }
