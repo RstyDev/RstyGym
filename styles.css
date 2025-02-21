@@ -89,7 +89,47 @@ button {
 
 #greet-input {
   margin-right: 5px;
+  width: 20px;
 }
+
+#menu{
+  height: fit-content;
+  background-color: #3f3f3f;
+  bottom: 0;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  display: flex;
+
+  & .menu_a{
+    width: 33.333%;
+    padding: 10px 0 15px;
+    background-color: #1f1f1f;
+    color: #fff;
+    &.selected:after {
+      border-top-right-radius: 15px;
+    }
+    &.selected:before {
+      border-top-right-radius: 15px;
+    }
+    /*TODO*/
+    &.selected {
+      border-radius: 10px;
+      background-color: #3f3f3f;
+      &:after {
+        border-top-left-radius: 15px;
+      }
+      &:before {
+        border-top-right-radius: 15px;
+      }
+    }
+
+    &:hover{
+      cursor: pointer;
+    }
+  }
+}
+
 
 @media (prefers-color-scheme: dark) {
   :root {

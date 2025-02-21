@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 
@@ -98,4 +99,39 @@ pub enum MuscleGroup {
     Legs,
     Abs,
     LowerBack,
+}
+
+impl Display for MuscleGroup {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("{}",match self {
+            MuscleGroup::Chest => "Chest",
+            MuscleGroup::Back => "Back",
+            MuscleGroup::Shoulders => "Shoulders",
+            MuscleGroup::Biceps => "Biceps",
+            MuscleGroup::Triceps => "Triceps",
+            MuscleGroup::Forearms => "Forearms",
+            MuscleGroup::Legs => "Legs",
+            MuscleGroup::Abs => "Abs",
+            MuscleGroup::LowerBack => "LowerBack",
+        }))
+    }
+}
+
+impl TryFrom<String> for MuscleGroup {
+    type Error = ();
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        match value.as_str() {
+            "Chest" => Ok(MuscleGroup::Chest),
+            "Back" => Ok(MuscleGroup::Back),
+            "Shoulders" => Ok(MuscleGroup::Shoulders),
+            "Biceps" => Ok(MuscleGroup::Biceps),
+            "Triceps" => Ok(MuscleGroup::Triceps),
+            "Forearms" => Ok(MuscleGroup::Forearms),
+            "Legs" => Ok(MuscleGroup::Legs),
+            "Abs" => Ok(MuscleGroup::Abs),
+            "LowerBack" => Ok(MuscleGroup::LowerBack),
+            _ => Err(()),
+        }
+    }
 }

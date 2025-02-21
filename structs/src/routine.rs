@@ -2,7 +2,6 @@ use crate::error::AppError;
 use crate::{day_template::DayTemplate, error::AppRes as Res, week::Week};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
-use std::rc::Rc;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Routine {
@@ -11,7 +10,7 @@ pub struct Routine {
     weeks: [Week; 4],
     last_check_in: NaiveDate,
     last_day_index: usize,
-    created_by: Rc<str>,
+    created_by: String,
     created_at: NaiveDate,
 }
 impl Routine {
@@ -21,7 +20,7 @@ impl Routine {
         weeks: [Week; 4],
         last_check_in: Option<NaiveDate>,
         last_day_index: Option<usize>,
-        created_by: Option<Rc<str>>,
+        created_by: Option<String>,
         created_at: NaiveDate,
     ) -> Routine {
         Routine {

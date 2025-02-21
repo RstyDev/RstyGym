@@ -1,4 +1,3 @@
-use std::rc::Rc;
 use chrono::NaiveDate;
 use sqlx::{query_as, FromRow, Pool, Sqlite};
 use structs::{
@@ -75,7 +74,7 @@ pub struct DayTemplateDB {
     id: i64,
     routine: i64,
 }
-pub trait RoutineTrait {
+pub trait RoutineTrait: Sized {
     async fn from_db(routine: RoutineDB, db: &Pool<Sqlite>) -> Res<Self>;
 }
 impl RoutineTrait for Routine {
@@ -88,12 +87,12 @@ impl RoutineTrait for Routine {
         }
         let mut weeks = [Week::default(),Week::default(),Week::default(),Week::default()];
         for (i,week) in week_query.into_iter().enumerate() {
-            weeks[i] = Week::from_db(week,db)?
+            weeks[i] = Week::from_db(week,db).await?
         }
-        Ok(Self::build(Some(routine.id),templates,weeks,Some(routine.last_check_in),Some(routine.last_day_index),Some(Rc::new(routine.created_by.into())),routine.created_at))
+        Ok(Self::build(Some(routine.id),templates,weeks,Some(routine.last_check_in),Some(routine.last_day_index),Some(routine.created_by),routine.created_at))
     }
 }
-pub trait WeekTrait {
+pub trait WeekTrait: Sized {
     async fn from_db(week: WeekDB, db: &Pool<Sqlite>) -> Res<Self>;
 }
 impl WeekTrait for Week {
@@ -101,12 +100,12 @@ impl WeekTrait for Week {
         let res = query_as!(DayDB, "select * from days where week = ?",week.id).fetch_all(db).await.map_err(|e|AppError::DBErr(e.to_string()))?;
         let mut days = [Day::default(),Day::default(),Day::default(),Day::default(),Day::default(),Day::default()];
         for (i,ser) in res.into_iter().enumerate() {
-            days[i] = Day::from_db(ser, db)?;
+            days[i] = Day::from_db(ser, db).await?;
         }
         Ok(Self::build(Some(week.id), week.completed, days))
     }
 }
-pub trait DayTemplateTrait {
+pub trait DayTemplateTrait: Sized {
     async fn from_db(day: DayTemplateDB, db: &Pool<Sqlite>) -> Res<Self>;
 }
 impl DayTemplateTrait for DayTemplate {
@@ -119,7 +118,7 @@ impl DayTemplateTrait for DayTemplate {
         Ok(Self::build(Some(day.id), exercises))
     }
 }
-pub trait DayTrait {
+pub trait DayTrait: Sized {
     async fn from_db(day_db: DayDB, db: &Pool<Sqlite>) -> Res<Self>;
 }
 impl DayTrait for Day {
@@ -137,18 +136,24 @@ impl DayTrait for Day {
         }, day.date,exercises))
     }
 }
-pub trait ExerciseTrait {
+pub trait ExerciseTrait: Sized {
     async fn from_db(exercise: ExerciseDB, db: &Pool<Sqlite>) -> Res<Self>;
 }
 impl ExerciseTrait for Exercise {
+    /*
+    'id' INTEGER NOT NULL,
+    'exercise' INTEGER NOT NULL,
+    'count' INTEGER NOT NULL,
+    'weight' REAL,
+    */
     async fn from_db(exercise: ExerciseDB, db: &Pool<Sqlite>) -> Res<Self> {
-        let res = query_as!(SeriesDB,"select * from series where exercise = ?",exercise.id).fetch_all(db).await.map_err(|e|AppError::DBErr(e.to_string()))?;
+        let res = query_as!(SeriesDB,r#"select id, exercise, count as "count:_", weight as "weight:_"  from series where exercise = ?"#,exercise.id).fetch_all(db).await.map_err(|e|AppError::DBErr(e.to_string()))?;
         let mut series = [None,None,None,None];
         for (i,ser) in res.into_iter().enumerate() {
             series[i] = Some(Series::from_db(ser).await);
         }
 
-        Ok(Exercise::build(Some(exercise.id),exercise.name.into(),series,exercise.group.into()))
+        Ok(Exercise::build(Some(exercise.id),exercise.name.as_str(),series,exercise.group.try_into().map_err(|a|{AppError::IndexErr})?))
     }
 }
 pub trait SeriesTrait {

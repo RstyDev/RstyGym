@@ -3,6 +3,7 @@ use sycamore::futures::spawn_local_scoped;
 use sycamore::prelude::*;
 use sycamore::web::events::SubmitEvent;
 use wasm_bindgen::prelude::*;
+use crate::menu::Menu;
 
 #[wasm_bindgen]
 extern "C" {
@@ -14,12 +15,21 @@ extern "C" {
 struct GreetArgs<'a> {
     name: &'a str,
 }
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq)]
+pub enum Selector{
+    Today,
+    Registry,
+    Config,
+}
+
 
 #[component]
 pub fn App() -> View {
     let name = create_signal(String::new());
     let greet_msg = create_signal(String::new());
-
+    let menu = create_signal(Selector::Today);
+    let m1 = menu.clone();
+    let menu_selector = create_selector( move ||m1.get());
     let greet = move |e: SubmitEvent| {
         e.prevent_default();
         spawn_local_scoped(async move {
@@ -60,6 +70,12 @@ pub fn App() -> View {
             p {
                 (greet_msg)
             }
+            (match menu_selector.get(){
+                Selector::Today => {view!{}}
+                Selector::Registry => {view!{}}
+                Selector::Config => {view!{}}
+            })
+            Menu(menu = menu)
         }
     }
 }
