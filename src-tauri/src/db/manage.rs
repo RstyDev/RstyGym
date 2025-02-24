@@ -59,6 +59,7 @@ pub async fn down(db: &Pool<Sqlite>) {
     DROP TABLE IF EXISTS weeks;
     DROP TABLE IF EXISTS day_templates;
     DROP TABLE IF EXISTS routines;
+    DROP TABLE IF EXISTS gym;
     "#,
     ))
     .await
@@ -112,5 +113,8 @@ CREATE TABLE IF NOT EXISTS 'routines' (
     'created_by' TEXT,
     'created_at' DATE NOT NULL,
     PRIMARY KEY ('id')
+);
+CREATE TABLE IF NOT EXISTS 'gym' (
+    name TEXT NOT NULL,
 );
  "#;
