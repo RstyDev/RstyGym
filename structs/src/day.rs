@@ -1,8 +1,10 @@
-use crate::error::AppError;
-use crate::{error::AppRes as Res, exercise::Exercise};
+use crate::{
+    error::{AppError, AppRes as Res},
+    exercise::Exercise,
+};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter, Write};
+use std::fmt::{Display, Formatter};
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
 pub enum DayState {
@@ -84,8 +86,6 @@ impl Day {
         }
     }
 }
-
-
 
 impl Display for DayState {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

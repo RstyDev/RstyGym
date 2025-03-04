@@ -10,5 +10,7 @@ pub enum AppError {
     #[error("DB Error: {0}")]
     DBErr(String),
     #[error("Unknown state: {0}")]
-    UnknownState(String)
+    UnknownState(String),
+    #[error("No current routine")]
+    NoCurrentRoutine,
 }

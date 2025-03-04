@@ -1,7 +1,7 @@
 use sqlx::{
+    Executor, Pool, Sqlite, SqlitePool,
     migrate::MigrateDatabase,
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
-    Executor, Pool, Sqlite, SqlitePool,
 };
 use std::str::FromStr;
 use structs::error::{AppError, AppRes as Res};

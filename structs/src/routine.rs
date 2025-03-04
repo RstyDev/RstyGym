@@ -1,5 +1,8 @@
-use crate::error::AppError;
-use crate::{day_template::DayTemplate, error::AppRes as Res, week::Week};
+use crate::{
+    day_template::DayTemplate,
+    error::{AppError, AppRes as Res},
+    week::Week,
+};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
@@ -70,5 +73,14 @@ impl Routine {
         } else {
             Err(AppError::IndexErr)
         }
+    }
+    pub fn is_current(&self) -> bool {
+        self.weeks.iter().any(|w| w.is_current())
+    }
+}
+
+impl PartialEq for Routine {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
     }
 }

@@ -1,5 +1,8 @@
-use crate::error::AppError;
-use crate::{day::Day, error::AppRes as Res};
+use crate::{
+    day::Day,
+    error::{AppError, AppRes as Res},
+};
+use chrono::Local;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
@@ -55,5 +58,10 @@ impl Week {
         } else {
             Err(AppError::IndexErr)
         }
+    }
+
+    pub fn is_current(&self) -> bool {
+        self.days[0].date() < &Local::now().date_naive()
+            && self.days[5].date() > &Local::now().date_naive()
     }
 }

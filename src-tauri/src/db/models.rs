@@ -1,14 +1,14 @@
 use crate::db::db;
 use chrono::NaiveDate;
-use sqlx::{query_as, FromRow, Pool, Sqlite};
+use sqlx::{FromRow, Pool, Sqlite, query_as};
 use std::sync::Arc;
 use structs::{
-    week::Week,
-    routine::Routine,
-    day_template::DayTemplate,
     day::{Day, DayState},
+    day_template::DayTemplate,
     error::{AppError, AppRes as Res},
     exercise::{Exercise, Series},
+    routine::Routine,
+    week::Week,
 };
 
 pub struct App {
@@ -20,7 +20,7 @@ pub struct App {
 impl App {
     pub async fn get() -> Res<App> {
         let db = Arc::new(db().await?);
-        Ok(App{
+        Ok(App {
             name: "Lucas".to_string(),
             routine: Routine::get(db.as_ref()).await?,
             db,
@@ -151,11 +151,10 @@ impl RoutineTrait for Routine {
         .await
         .map_err(|e| AppError::DBErr(e.to_string()))?;
 
-        match routine_db{
+        match routine_db {
             None => Ok(None),
             Some(a) => Ok(Some(Self::from_db(a, db).await?)),
         }
-
     }
 }
 pub trait WeekTrait: Sized {

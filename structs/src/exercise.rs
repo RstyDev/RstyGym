@@ -1,19 +1,23 @@
-use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
-use std::rc::Rc;
+use std::fmt::{Display, Formatter};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Exercise {
     id: i64,
-    name: Rc<str>,
-    series: [Option<Series>;4],
+    name: String,
+    series: [Option<Series>; 4],
     group: MuscleGroup,
 }
 impl Exercise {
-    pub fn build(id: Option<i64>, name: &str, series: [Option<Series>;4], group: MuscleGroup) -> Exercise {
+    pub fn build(
+        id: Option<i64>,
+        name: String,
+        series: [Option<Series>; 4],
+        group: MuscleGroup,
+    ) -> Exercise {
         Exercise {
             id: id.unwrap_or_default(),
-            name: name.into(),
+            name,
             series,
             group,
         }
@@ -27,24 +31,31 @@ impl Exercise {
     pub fn name(&self) -> &str {
         &self.name
     }
-    pub fn set_name(&mut self, name: &str) {
-        self.name = name.into();
+    pub fn set_name(&mut self, name: String) {
+        self.name = name;
     }
-    pub fn series(&self) -> &[Option<Series>;4] {
+    pub fn series(&self) -> &[Option<Series>; 4] {
         &self.series
     }
     pub fn series_at(&self, index: usize) -> Option<&Series> {
         if index >= self.series.len() {
             self.series[index].as_ref()
-        }else{None}
+        } else {
+            None
+        }
     }
     pub fn series_at_mut(&mut self, index: usize) -> Option<&mut Series> {
         if index >= self.series.len() {
             self.series[index].as_mut()
-        }else{None}
+        } else {
+            None
+        }
     }
-    pub fn set_series(&mut self, series: [Option<Series>;4]) {
+    pub fn set_series(&mut self, series: [Option<Series>; 4]) {
         self.series = series;
+    }
+    pub fn set_series_at(&mut self, index: usize, series: Option<Series>) {
+        self.series[index] = series;
     }
     pub fn group(&self) -> &MuscleGroup {
         &self.group
@@ -101,19 +112,38 @@ pub enum MuscleGroup {
     LowerBack,
 }
 
+impl MuscleGroup {
+    pub fn iter() -> [MuscleGroup; 9] {
+        [
+            MuscleGroup::Chest,
+            MuscleGroup::Back,
+            MuscleGroup::Shoulders,
+            MuscleGroup::Biceps,
+            MuscleGroup::Triceps,
+            MuscleGroup::Forearms,
+            MuscleGroup::Legs,
+            MuscleGroup::Abs,
+            MuscleGroup::LowerBack,
+        ]
+    }
+}
+
 impl Display for MuscleGroup {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt(format_args!("{}",match self {
-            MuscleGroup::Chest => "Chest",
-            MuscleGroup::Back => "Back",
-            MuscleGroup::Shoulders => "Shoulders",
-            MuscleGroup::Biceps => "Biceps",
-            MuscleGroup::Triceps => "Triceps",
-            MuscleGroup::Forearms => "Forearms",
-            MuscleGroup::Legs => "Legs",
-            MuscleGroup::Abs => "Abs",
-            MuscleGroup::LowerBack => "LowerBack",
-        }))
+        f.write_fmt(format_args!(
+            "{}",
+            match self {
+                MuscleGroup::Chest => "Chest",
+                MuscleGroup::Back => "Back",
+                MuscleGroup::Shoulders => "Shoulders",
+                MuscleGroup::Biceps => "Biceps",
+                MuscleGroup::Triceps => "Triceps",
+                MuscleGroup::Forearms => "Forearms",
+                MuscleGroup::Legs => "Legs",
+                MuscleGroup::Abs => "Abs",
+                MuscleGroup::LowerBack => "LowerBack",
+            }
+        ))
     }
 }
 

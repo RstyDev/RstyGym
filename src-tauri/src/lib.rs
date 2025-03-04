@@ -1,15 +1,17 @@
 mod db;
 
-use std::sync::Arc;
 use db::App;
-use tauri::{async_runtime::{block_on, Mutex},State};
-use structs::{error::StrRes as Res,routine::Routine};
-
+use std::sync::Arc;
+use structs::{error::StrRes as Res, routine::Routine};
+use tauri::{
+    State,
+    async_runtime::{Mutex, block_on},
+};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
-async fn get_state(app: State<'_,Mutex<App>>) -> Res<Option<Routine>> {
-    Ok(app.lock().await.routine().map(|r|r.clone()))
+async fn get_state(app: State<'_, Mutex<App>>) -> Res<Option<Routine>> {
+    Ok(app.lock().await.routine().map(|r| r.clone()))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

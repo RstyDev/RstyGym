@@ -56,7 +56,7 @@ h1 {
   text-align: center;
 }
 
-input,
+input, select,
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -87,14 +87,11 @@ button {
   outline: none;
 }
 
-#greet-input {
-  margin-right: 5px;
-  width: 20px;
-}
+
 
 #menu{
   height: fit-content;
-  background-color: #3f3f3f;
+  background-image: linear-gradient(#393939, #1f1f1f);
   bottom: 0;
   position: fixed;
   width: 100%;
@@ -106,42 +103,35 @@ button {
     padding: 10px 0 15px;
     background-color: #1f1f1f;
     color: #fff;
-    &.selected:after {
-      border-top-right-radius: 15px;
+    &:has(+ .selected){
+      border-top-right-radius: 20px;
     }
-    &.selected:before {
-      border-top-right-radius: 15px;
+    &.selected +.menu_a {
+      border-top-left-radius: 20px;
     }
-    /*TODO*/
     &.selected {
-      border-radius: 10px;
-      background-color: #3f3f3f;
-      &:after {
-        border-top-left-radius: 15px;
-      }
-      &:before {
-        border-top-right-radius: 15px;
-      }
-    }
+      border-bottom-right-radius: 20px;
+      border-bottom-left-radius: 20px;
+      background-color: #393939;
 
+    }
     &:hover{
       cursor: pointer;
     }
   }
 }
 
-
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f6f6f6;
-    background-color: #2f2f2f;
+    background-color: #393939;
   }
 
   a:hover {
     color: #24c8db;
   }
 
-  input,
+  input, select,
   button {
     color: #ffffff;
     background-color: #0f0f0f98;

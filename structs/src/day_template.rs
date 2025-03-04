@@ -1,5 +1,7 @@
-use crate::error::AppError;
-use crate::{error::AppRes as Res, exercise::Exercise};
+use crate::{
+    error::{AppError, AppRes as Res},
+    exercise::Exercise,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
@@ -20,6 +22,9 @@ impl DayTemplate {
     }
     pub fn exercises(&self) -> &Vec<Exercise> {
         &self.exercises
+    }
+    pub fn exercises_mut(&mut self) -> &mut Vec<Exercise> {
+        &mut self.exercises
     }
     pub fn exercise_at(&self, index: usize) -> Res<&Exercise> {
         if &self.exercises.len() > &index {
