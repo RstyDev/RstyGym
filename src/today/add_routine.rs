@@ -39,19 +39,27 @@ pub fn AddRoutine(routine: Signal<Option<Routine>>) -> View {
         s.set(State::NotAdding);
     };
 
-    let (tmp1, tmp2, tmp3) = (
+    let (tmp1, tmp2, tmp3, tmp4) = (
+        week_template.clone(),
         week_template.clone(),
         week_template.clone(),
         week_template.clone(),
     );
-
-    let (dy_tmp, dy2, dy3, dy4) = (
+    let tmp = tmp1.clone();
+    let tmp_selector = create_selector(move ||tmp.with(|a|{a.len()>0}));
+    let (dy_tmp, dy2, dy3, dy4, dy5, dy6) = (
+        day_template.clone(),
+        day_template.clone(),
         day_template.clone(),
         day_template.clone(),
         day_template.clone(),
         day_template.clone(),
     );
-    create_memo(move ||{console_log!("{:#?}",dy4.get_clone())});
+    let dy = dy5.clone();
+    let dy_selector = create_selector(move || dy.with(|d|d.exercises().len()>0));
+    let dy_selector2 = dy_selector.clone();
+    create_memo(move || console_log!("WeekTemplate: \n{:#?}", tmp4.get_clone()));
+    create_memo(move || console_log!("DayTemplate: \n{:#?}", dy4.get_clone()));
     let (s1, s2, s3, s4, s5, s6, s7) = (
         state.clone(),
         state.clone(),
@@ -71,29 +79,68 @@ pub fn AddRoutine(routine: Signal<Option<Routine>>) -> View {
                 }){"Add Template"}
             },
             State::AddingWeekTemplate => {
-                // let days_view = tmp3.get_clone_untracked().iter().enumerate().map(|(i,day)|view!{
-                //     article(){
-                //         (format!("Day {}, {} exercises",i,day.exercises().len()))
-                //     }
-                // }).collect::<Vec<View>>(); TODO!
                 view!{
-                    (days_view)
+                    section(class = "frame"){
+                        (match tmp_selector.get(){
+                            true => {
+                                let dato = tmp3.get_clone();
+                                let days_view = tmp3.get_clone().into_iter().enumerate().map(|(i,day)|view!{
+                                    article(){
+                                        (format!("Day {}, {} exercises",i+1,day.exercises().len()))
+                                    }
+                                }).collect::<Vec<View>>();
+                                view!{(days_view)}
+                            }
+                            false => {view!{article(){"-"}}}
+                        })
+
+                    }
                     button(on:click =move |_|{
                         s6.set(State::AddingDayTemplate)
                     }){"Add Day"}
                     button(on:click= move |_|{
-                        let rtn = Routine::build(None,week_template.get_clone(),[Week::default(),Week::default(),Week::default(),Week::default()],None,None,Some(String::from("Lucas")),Local::now().date_naive());
+                        let rtn = Routine::build(
+                            None,
+                            week_template.get_clone(),
+                            [
+                                Week::default(),
+                                Week::default(),
+                                Week::default(),
+                                Week::default()
+                            ],
+                            None,
+                            None,
+                            Some(String::from("Lucas")),
+                            Local::now().date_naive());
+                        routine.set(Some(rtn));
                         s6.set(State::NotAdding)
                     }){"Done"}
                     button(on:click = cancel ){"Cancel"}
                 }
             },
             State::AddingDayTemplate => view!{
+                section(class = "frame"){
+                    (match dy_selector2.get(){
+                        true => {
+                            let data = dy6.with(|d|{d.exercises().clone()});
+                            let view = data.into_iter().map(|ex|view!{
+                                article(){
+                                    (ex.name().to_string())
+                                }
+                            }).collect::<Vec<View>>();
+                            view!{
+                                (view)
+                            }
+                        }
+                        false => {view!{article(){"-"}}}
+                    })
+                }
                 button(on:click = move |_|{
                     s1.set(State::AddingExercise);
                 }){"Add Exercise"}
                 button(on:click = move |_| {
                     week_template.update(|w|{w.push(day_template.get_clone())});
+                    dy5.set(DayTemplate::default());
                     s1.set(State::AddingWeekTemplate)
                 }){"Done"}
                 button(on:click = move |_|{
@@ -102,6 +149,24 @@ pub fn AddRoutine(routine: Signal<Option<Routine>>) -> View {
                 button(on:click = cancel ){"Cancel"}
             },
             State::AddingExercise => view!{
+                section(class = "frame"){
+                    (match dy_selector.get(){
+                        true => {
+                            let data = dy5.with(|d|{d.exercises().clone()});
+                            let view = data.into_iter().map(|ex|view!{
+                                article(){
+                                    (ex.name().to_string())
+                                }
+                            }).collect::<Vec<View>>();
+                            view!{
+                                (view)
+                            }
+                        }
+                        false => {
+                            view!{article(){"-"}}
+                        }
+                    })
+                }
                 AddExercise(exercise = exercise)
                 button(on:click = move |_|{
                     let ex = exercise.get_clone();

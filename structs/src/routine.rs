@@ -36,6 +36,12 @@ impl Routine {
             created_at,
         }
     }
+    pub fn id(&self) -> &i64 {
+        &self.id
+    }
+    pub fn set_id(&mut self, id: i64) {
+        self.id = id;
+    }
     pub fn templates(&self) -> &Vec<DayTemplate> {
         &self.templates
     }

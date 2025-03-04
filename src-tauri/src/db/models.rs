@@ -1,6 +1,6 @@
 use crate::db::db;
-use chrono::NaiveDate;
-use sqlx::{FromRow, Pool, Sqlite, query_as};
+use chrono::{Local, NaiveDate};
+use sqlx::{FromRow, Pool, Sqlite, query_as, query};
 use std::sync::Arc;
 use structs::{
     day::{Day, DayState},
@@ -31,6 +31,10 @@ impl App {
     }
     pub fn routine(&self) -> Option<&Routine> {
         self.routine.as_ref()
+    }
+    pub fn set_routine(&mut self, routine: Routine) -> Res<i64> {
+        self.routine = Some(routine);
+        self.routine.as_mut().unwrap().save(self.db.as_ref())
     }
     pub fn db(&self) -> &Pool<Sqlite> {
         self.db.as_ref()
@@ -104,6 +108,7 @@ pub struct DayTemplateDB {
 pub trait RoutineTrait: Sized {
     async fn from_db(routine: RoutineDB, db: &Pool<Sqlite>) -> Res<Self>;
     async fn get(db: &Pool<Sqlite>) -> Res<Option<Self>>;
+    async fn save(&mut self, db: &Pool<Sqlite>) -> Res<()>;
 }
 impl RoutineTrait for Routine {
     async fn from_db(routine: RoutineDB, db: &Pool<Sqlite>) -> Res<Self> {
@@ -155,6 +160,19 @@ impl RoutineTrait for Routine {
             None => Ok(None),
             Some(a) => Ok(Some(Self::from_db(a, db).await?)),
         }
+    }
+/*
+'id' INTEGER NOT NULL,
+    'last_check_in' DATE NOT NULL,
+    'last_day_index' INTEGER NOT NULL,
+    'created_by' TEXT,
+    'created_at' DATE NOT NULL,*/
+    async fn save(&mut self, db: &Pool<Sqlite>) -> Res<()> {
+        let res = query("insert into routines (last_check_in, last_day_index, created_by, created_at) values (?, ?, ?, ?)").bind(NaiveDate::default()).bind(-1).bind("Lucas").bind(Local::now().date_naive()).execute(db).await.map_err(|e|AppError::DBErr(e.to_string()))?;
+        self.set_id(res.last_insert_rowid());
+
+        //TODO!!
+        Ok(())
     }
 }
 pub trait WeekTrait: Sized {

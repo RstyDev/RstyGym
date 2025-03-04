@@ -4,13 +4,14 @@ use web_sys::KeyboardEvent;
 
 #[component(inline_props)]
 pub fn AddExercise(exercise: Signal<Exercise>) -> View {
-    let (ex0, ex5, ex6) = (
-        exercise.clone(),
-        exercise.clone(),
-        exercise.clone()
-    );
+    let (ex0, ex5, ex6) = (exercise.clone(), exercise.clone(), exercise.clone());
     let name = create_signal(String::new());
-    let series = [create_signal(String::new()),create_signal(String::new()),create_signal(String::new()),create_signal(String::new())];
+    let series = [
+        create_signal(String::new()),
+        create_signal(String::new()),
+        create_signal(String::new()),
+        create_signal(String::new()),
+    ];
     let inputs = series.iter().cloned().enumerate().map(|(i,s)|{view!{
         input(placeholder = format!("{}",match i{
             0=>"1st",

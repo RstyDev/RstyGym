@@ -14,6 +14,13 @@ async fn get_state(app: State<'_, Mutex<App>>) -> Res<Option<Routine>> {
     Ok(app.lock().await.routine().map(|r| r.clone()))
 }
 
+#[tauri::command]
+async fn new_routine(app: State<'_, Mutex<App>>, routine: Routine) -> Res<i64> {
+    let mut lock = app.lock().await;
+    let id = lock.set_routine(routine);
+    Ok(id)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()

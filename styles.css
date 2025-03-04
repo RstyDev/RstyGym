@@ -26,6 +26,11 @@
   text-align: center;
 }
 
+.frame {
+  border: solid #bbb;
+  border-radius: 10px;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -83,7 +88,7 @@ button:active {
 }
 
 input,
-button {
+button, select {
   outline: none;
 }
 
