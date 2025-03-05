@@ -2,6 +2,7 @@ mod app;
 mod libs;
 mod menu;
 mod today;
+mod commands;
 
 use app::App;
 
