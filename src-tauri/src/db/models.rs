@@ -34,7 +34,7 @@ impl App {
     }
     pub fn set_routine(&mut self, routine: Routine) -> Res<i64> {
         self.routine = Some(routine);
-        self.routine.as_mut().unwrap().save(self.db.as_ref())
+        self.routine.as_mut().unwrap().save(self.db.as_ref())?
     }
     pub fn db(&self) -> &Pool<Sqlite> {
         self.db.as_ref()
@@ -170,13 +170,19 @@ impl RoutineTrait for Routine {
     async fn save(&mut self, db: &Pool<Sqlite>) -> Res<()> {
         let res = query("insert into routines (last_check_in, last_day_index, created_by, created_at) values (?, ?, ?, ?)").bind(NaiveDate::default()).bind(-1).bind("Lucas").bind(Local::now().date_naive()).execute(db).await.map_err(|e|AppError::DBErr(e.to_string()))?;
         self.set_id(res.last_insert_rowid());
-
+        for i in 0..self.templates().len(){
+            self.template_at_mut(i)?.save(*self.id(),db)?
+        }
+        for i in 0..4{
+            self.week_at_mut(i)?.save(*self.id(),db)?
+        }
         //TODO!!
         Ok(())
     }
 }
 pub trait WeekTrait: Sized {
     async fn from_db(week: WeekDB, db: &Pool<Sqlite>) -> Res<Self>;
+    async fn save(&mut self, id: i64, db: &Pool<Sqlite>) -> Res<()>;
 }
 impl WeekTrait for Week {
     async fn from_db(week: WeekDB, db: &Pool<Sqlite>) -> Res<Self> {
@@ -197,9 +203,14 @@ impl WeekTrait for Week {
         }
         Ok(Self::build(Some(week.id), week.completed, days))
     }
+
+    async fn save(&mut self, id: i64, db: &Pool<Sqlite>) -> Res<()> {
+        todo!()
+    }
 }
 pub trait DayTemplateTrait: Sized {
     async fn from_db(day: DayTemplateDB, db: &Pool<Sqlite>) -> Res<Self>;
+    async fn save(&mut self, id: i64, db: &Pool<Sqlite>) -> Res<()>;
 }
 impl DayTemplateTrait for DayTemplate {
     async fn from_db(day: DayTemplateDB, db: &Pool<Sqlite>) -> Res<Self> {
@@ -216,6 +227,14 @@ impl DayTemplateTrait for DayTemplate {
             exercises.push(Exercise::from_db(ser, db).await?);
         }
         Ok(Self::build(Some(day.id), exercises))
+    }
+    async fn save(&mut self,id: i64, db: &Pool<Sqlite>) -> Res<()> {
+        let res = query("insert into day_templates (routine) values (?)").bind(id).execute(db).await.map_err(|e|AppError::DBErr(e.to_string()))?;
+        self.set_id(res.last_insert_rowid());
+        for i in 0..self.exercises().len(){
+            self.exercise_at_mut(i)?.save(DayOrTemplate::Template(id),db)?
+        }
+        Ok(())
     }
 }
 pub trait DayTrait: Sized {
@@ -244,8 +263,13 @@ impl DayTrait for Day {
         ))
     }
 }
+pub enum DayOrTemplate {
+    Day(i64),
+    Template(i64),
+}
 pub trait ExerciseTrait: Sized {
     async fn from_db(exercise: ExerciseDB, db: &Pool<Sqlite>) -> Res<Self>;
+    async fn save(&mut self, id: DayOrTemplate, db: &Pool<Sqlite>) -> Res<()>;
 }
 impl ExerciseTrait for Exercise {
     /*
@@ -268,12 +292,41 @@ impl ExerciseTrait for Exercise {
             exercise.group.try_into().map_err(|a| AppError::IndexErr)?,
         ))
     }
+/*
+'name' TEXT NOT NULL,
+    'group' TEXT NOT NULL,
+    'day' INTEGER,
+    'day_template' INTEGER,*/
+    async fn save(&mut self, id: DayOrTemplate, db: &Pool<Sqlite>) -> Res<()> {
+        let (string,id) = match id{
+            DayOrTemplate::Day(d) => ("day", d),
+            DayOrTemplate::Template(d) => ("day_template", d),
+        };
+        let res = query(format!("insert into exercises (name, group, {}) values (?, ?, ?)",string).as_str()).bind(self.name()).bind(self.group().to_string()).bind(id).execute(db).await.map_err(|e|AppError::DBErr(e.to_string()))?;
+        self.set_id(res.last_insert_rowid());
+        for i in 0..4{
+            if let Some(series) = self.series_at_mut(i) {
+                series.save(*self.id(), db)?
+            }
+        }
+        Ok(())
+    }
 }
 pub trait SeriesTrait {
     async fn from_db(series_db: SeriesDB) -> Self;
+    async fn save(&mut self, id: i64, db: &Pool<Sqlite>) -> Res<()>;
 }
 impl SeriesTrait for Series {
     async fn from_db(series: SeriesDB) -> Self {
         Self::build(Some(series.id), series.count, series.weight)
+    }
+/*
+'exercise' INTEGER NOT NULL,
+    'count' INTEGER NOT NULL,
+    'weight' REAL,*/
+    async fn save(&mut self, id: i64, db: &Pool<Sqlite>) -> Res<()> {
+        let res = query("insert into series (exercise, count, weight) values (?, ?, ?)").bind(id).bind(*self.count()).bind(self.weight()).execute(db).await.map_err(|e|AppError::DBErr(e.to_string()))?;
+        self.set_id(res.last_insert_rowid());
+        Ok(())
     }
 }

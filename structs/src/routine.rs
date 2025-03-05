@@ -52,6 +52,13 @@ impl Routine {
             Err(AppError::IndexErr)
         }
     }
+    pub fn template_at_mut(&mut self, index: usize) -> Res<&mut DayTemplate> {
+        if &self.templates.len() > &index {
+            Ok(&mut self.templates[index])
+        } else {
+            Err(AppError::IndexErr)
+        }
+    }
     pub fn weeks(&self) -> &[Week; 4] {
         &self.weeks
     }

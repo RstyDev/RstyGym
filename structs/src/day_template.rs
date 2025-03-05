@@ -20,6 +20,10 @@ impl DayTemplate {
     pub fn id(&self) -> &i64 {
         &self.id
     }
+
+    pub fn set_id(&mut self, id: i64) {
+        self.id = id;
+    }
     pub fn exercises(&self) -> &Vec<Exercise> {
         &self.exercises
     }
@@ -29,6 +33,13 @@ impl DayTemplate {
     pub fn exercise_at(&self, index: usize) -> Res<&Exercise> {
         if &self.exercises.len() > &index {
             Ok(&self.exercises[index])
+        } else {
+            Err(AppError::IndexErr)
+        }
+    }
+    pub fn exercise_at_mut(&mut self, index: usize) -> Res<&mut Exercise> {
+        if self.exercises.len() > index {
+            Ok(&mut self.exercises[index])
         } else {
             Err(AppError::IndexErr)
         }
