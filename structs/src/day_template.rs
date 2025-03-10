@@ -34,14 +34,14 @@ impl DayTemplate {
         if &self.exercises.len() > &index {
             Ok(&self.exercises[index])
         } else {
-            Err(AppError::IndexErr)
+            Err(AppError::IndexErr(37))
         }
     }
     pub fn exercise_at_mut(&mut self, index: usize) -> Res<&mut Exercise> {
         if self.exercises.len() > index {
             Ok(&mut self.exercises[index])
         } else {
-            Err(AppError::IndexErr)
+            Err(AppError::IndexErr(44))
         }
     }
 }

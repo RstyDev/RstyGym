@@ -1,5 +1,5 @@
 use crate::today::add_exercise::AddExercise;
-use chrono::Local;
+use chrono::{Days, Local};
 use serde_wasm_bindgen::from_value;
 use sycamore::futures::spawn_local_scoped;
 use structs::day_template::DayTemplate;
@@ -10,7 +10,7 @@ use sycamore::prelude::*;
 use sycamore::rt::{console_error, spawn_local};
 use web_sys::MouseEvent;
 use crate::commands::NewRoutine;
-use crate::libs::call;
+use crate::libs::{call, log};
 
 #[derive(Clone, Copy, PartialEq, Default)]
 enum State {
@@ -76,8 +76,8 @@ pub fn AddRoutine(routine: Signal<Option<Routine>>) -> View {
     let dy = dy5.clone();
     let dy_selector = create_selector(move || dy.with(|d| d.exercises().len() > 0));
     let dy_selector2 = dy_selector.clone();
-    create_memo(move || console_log!("WeekTemplate: \n{:#?}", tmp4.get_clone()));
-    create_memo(move || console_log!("DayTemplate: \n{:#?}", dy4.get_clone()));
+    create_memo(move || log("WeekTemplate",79,&tmp4.get_clone()));
+    create_memo(move || log("DayTemplate",80,&dy4.get_clone()));
     let rtn1 = routine.clone();
     let (s1, s2, s3, s4, s5, s6, s7, s8) = (
         state.clone(),
@@ -89,12 +89,9 @@ pub fn AddRoutine(routine: Signal<Option<Routine>>) -> View {
         state.clone(),
         state.clone(),
     );
-    create_effect(move || {
-        rtn1.track();
-        s6.set(State::NotAdding);
-    });
+
     let state_selector = create_selector(move || state.get());
-    create_memo(move || console_log!("{:#?}", ex1.get_clone()));
+    create_memo(move || log("Exercise",94,&ex1.get_clone()));
     view! {
         (match state_selector.get(){
             State::NotAdding => view!{},
@@ -127,14 +124,15 @@ pub fn AddRoutine(routine: Signal<Option<Routine>>) -> View {
                         s6.set(State::AddingDayTemplate)
                     }){"Add Day"}
                     button(on:click= move |_|{
+                        let today = Local::now().date_naive();
                         let rtn = Routine::build(
                             None,
                             week_template.get_clone(),
                             [
-                                Week::default(),
-                                Week::default(),
-                                Week::default(),
-                                Week::default()
+                                Week::build_from_day(today),
+                                Week::build_from_day(today.checked_add_days(Days::new(7)).unwrap()),
+                                Week::build_from_day(today.checked_add_days(Days::new(14)).unwrap()),
+                                Week::build_from_day(today.checked_add_days(Days::new(21)).unwrap()),
                             ],
                             None,
                             None,

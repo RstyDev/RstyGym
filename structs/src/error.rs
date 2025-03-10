@@ -5,12 +5,12 @@ pub type StrRes<T> = std::result::Result<T, String>;
 
 #[derive(Debug, Error)]
 pub enum AppError {
-    #[error("Index out of bounds")]
-    IndexErr,
-    #[error("DB Error: {0}")]
-    DBErr(String),
-    #[error("Unknown state: {0}")]
-    UnknownState(String),
-    #[error("No current routine")]
-    NoCurrentRoutine,
+    #[error("Index out of bounds \nLine {0}")]
+    IndexErr(u16),
+    #[error("DB Error: {1} \nLine {0}")]
+    DBErr(u16,String),
+    #[error("Unknown state: {1} \nLine {0}")]
+    UnknownState(u16,String),
+    #[error("No current routine \nLine {0}")]
+    NoCurrentRoutine(u16),
 }

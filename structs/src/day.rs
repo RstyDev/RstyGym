@@ -6,7 +6,7 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 
-#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, Copy, PartialEq)]
 pub enum DayState {
     #[default]
     Free,
@@ -61,7 +61,7 @@ impl Day {
         if &self.exercises.len() > &index {
             Ok(&self.exercises[index])
         } else {
-            Err(AppError::IndexErr)
+            Err(AppError::IndexErr(64))
         }
     }
     pub fn exercises_mut(&mut self) -> &mut Vec<Exercise> {
@@ -71,7 +71,7 @@ impl Day {
         if &self.exercises.len() > &index {
             Ok(&mut self.exercises[index])
         } else {
-            Err(AppError::IndexErr)
+            Err(AppError::IndexErr(74))
         }
     }
     pub fn set_exercises(&mut self, exercises: Vec<Exercise>) {
@@ -82,7 +82,7 @@ impl Day {
             self.exercises[index] = exercise;
             Ok(())
         } else {
-            Err(AppError::IndexErr)
+            Err(AppError::IndexErr(85))
         }
     }
 }

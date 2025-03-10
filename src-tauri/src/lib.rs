@@ -9,6 +9,11 @@ use tauri::{
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
+async fn check_in(app: State<'_, Mutex<App>>) -> Res<()> {
+    let mut lock = app.lock().await;
+    lock.check_in().await.map_err(|e|e.to_string())
+}
+#[tauri::command]
 async fn get_state(app: State<'_, Mutex<App>>) -> Res<Option<Routine>> {
     Ok(app.lock().await.routine().map(|r| r.clone()))
 }
@@ -26,6 +31,7 @@ pub fn run() {
         .manage(Mutex::new(block_on(App::get()).unwrap()))
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
+            check_in,
             get_state,
             new_routine
         ])

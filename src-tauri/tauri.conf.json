@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.rstygym.app",
   "build": {
-    "devUrl": "http://localhost:1420",
+    "devUrl": "http://localhost:1480",
     "beforeBuildCommand": "trunk build --release",
     "frontendDist": "../dist"
   },
