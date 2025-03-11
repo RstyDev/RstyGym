@@ -41,9 +41,9 @@ pub fn App() -> View {
     });
     view! {
         main(class="container") {
-            h1 {
-                "Welcome to Tauri + Sycamore"
-            }
+            // h1 {
+            //     "Welcome to Tauri + Sycamore"
+            // }
 
             div(class="row") {
                 a(href="https://tauri.app", target="_blank") {

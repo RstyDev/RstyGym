@@ -1,7 +1,7 @@
 mod db;
 
 use db::App;
-use structs::{error::StrRes as Res, routine::Routine};
+use structs::{error::StrRes as Res, routine::Routine, day::Day};
 use tauri::{
     State,
     async_runtime::{Mutex, block_on},
@@ -9,9 +9,11 @@ use tauri::{
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
-async fn check_in(app: State<'_, Mutex<App>>) -> Res<()> {
+async fn check_in(app: State<'_, Mutex<App>>) -> Res<Day> {
     let mut lock = app.lock().await;
-    lock.check_in().await.map_err(|e|e.to_string())
+    lock.check_in().await.map_err(|e|e.to_string())?;
+    Ok(lock.routine().as_ref().unwrap().today().cloned().unwrap())
+
 }
 #[tauri::command]
 async fn get_state(app: State<'_, Mutex<App>>) -> Res<Option<Routine>> {

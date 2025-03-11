@@ -83,6 +83,10 @@ impl Week {
         }
         res
     }
+    pub fn set_today(&mut self, day: Day) {
+        let i = self.days().into_iter().enumerate().find_map(|d|(d.1.date() == &Local::now().date_naive()).then_some(d.0)).unwrap();
+        self.days[i] = day;
+    }
     pub fn set_days(&mut self, days: [Day; 6]) {
         self.days = days;
     }

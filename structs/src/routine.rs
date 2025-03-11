@@ -13,7 +13,7 @@ pub struct Routine {
     templates: Vec<DayTemplate>,
     weeks: [Week; 4],
     last_check_in: NaiveDate,
-    last_day_index: Option<usize>,
+    last_day_index: Option<i64>,
     created_by: String,
     created_at: NaiveDate,
 }
@@ -23,7 +23,7 @@ impl Routine {
         templates: Vec<DayTemplate>,
         weeks: [Week; 4],
         last_check_in: Option<NaiveDate>,
-        last_day_index: Option<usize>,
+        last_day_index: Option<i64>,
         created_by: Option<String>,
         created_at: NaiveDate,
     ) -> Routine {
@@ -32,7 +32,7 @@ impl Routine {
             templates,
             weeks,
             last_check_in: last_check_in.unwrap_or_default(),
-            last_day_index: last_day_index,
+            last_day_index,
             created_by: created_by.unwrap_or_default(),
             created_at,
         }
@@ -113,10 +113,10 @@ impl Routine {
     pub fn set_last_check_in(&mut self, date: NaiveDate) {
         self.last_check_in = date;
     }
-    pub fn last_day_index(&self) -> Option<usize> {
+    pub fn last_day_index(&self) -> Option<i64> {
         self.last_day_index
     }
-    pub fn set_last_day_index(&mut self, index: usize) {
+    pub fn set_last_day_index(&mut self, index: i64) {
         self.last_day_index = Some(index);
     }
 }

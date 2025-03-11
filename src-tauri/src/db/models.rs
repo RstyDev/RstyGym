@@ -28,15 +28,23 @@ impl App {
     }
     pub async fn check_in(&mut self) -> Res<()> {
         let db = self.db.as_ref();
+
         match self.routine.as_mut(){
             None => { Err(AppError::NoCurrentRoutine(33)) },
             Some(rt) => {
+                let exercises= rt.template_at((rt.last_day_index().unwrap_or(-1) +1 ) as usize)?.exercises().clone();
+
+
 
                 match rt.this_week_mut() {
                     None => { Err(AppError::NoCurrentRoutine(36)) },
                     Some(w) => match w.today_mut(){
                         None => Err(AppError::NoCurrentRoutine(38)),
-                        Some(d) => d.check_in(db).await,
+                        Some(d) => {
+                            d.check_in(db).await?;
+                            d.set_exercises(exercises);
+                            Ok(())
+                        }
                     },
                 }
             }
@@ -109,7 +117,7 @@ impl RoutineTrait for Routine {
             templates,
             weeks,
             Some(routine.last_check_in),
-            Some(routine.last_day_index as usize),
+            Some(routine.last_day_index),
             routine.created_by,
             routine.created_at,
         ))
@@ -122,7 +130,6 @@ impl RoutineTrait for Routine {
             inner join weeks on routines.id = weeks.routine
             inner join days on weeks.id = days.week
             where days.date = ? "#,today).fetch_optional(db).await.map_err(|e| AppError::DBErr(122,e.to_string()))?;
-        println!("{:#?}",exists.as_ref().map(|e|e.int));
         match exists {
             None => {Ok(None)}
             Some(id) => {
@@ -133,7 +140,6 @@ impl RoutineTrait for Routine {
                 .fetch_optional(db)
                 .await
                 .map_err(|e| AppError::DBErr(123,e.to_string()))?;
-                println!("{:#?}", routine_db.as_ref().map(|r|{r.id}));
                 match routine_db {
                     None => Ok(None),
                     Some(a) => Ok(Some(Self::from_db(a, db).await?)),
