@@ -38,15 +38,15 @@ impl Exercise {
         &self.series
     }
     pub fn series_at(&self, index: usize) -> Option<&Series> {
-        if index >= self.series.len() {
+        if index <= self.series.len() {
             self.series[index].as_ref()
         } else {
             None
         }
     }
-    pub fn series_at_mut(&mut self, index: usize) -> Option<&mut Series> {
-        if index >= self.series.len() {
-            self.series[index].as_mut()
+    pub fn series_at_mut(&mut self, index: usize) -> Option<&mut Option<Series>> {
+        if index <= self.series.len() {
+            Some(&mut self.series[index])
         } else {
             None
         }
@@ -62,6 +62,11 @@ impl Exercise {
     }
     pub fn set_group(&mut self, group: MuscleGroup) {
         self.group = group;
+    }
+}
+impl PartialEq for Exercise {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == self.name
     }
 }
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]

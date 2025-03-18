@@ -23,7 +23,7 @@ pub async fn db() -> Res<Pool<Sqlite>> {
             .create_if_missing(true),
         Err(e) => {
             println!("{}", e);
-            return Err(AppError::DBErr(26,url.to_string()));
+            return Err(AppError::DBErr(26, url.to_string()));
         }
     }
     .journal_mode(SqliteJournalMode::Wal)
@@ -33,7 +33,7 @@ pub async fn db() -> Res<Pool<Sqlite>> {
         Ok(o) => o,
         Err(e) => {
             println!("{e}");
-            return Err(AppError::DBErr(36,url.to_string()));
+            return Err(AppError::DBErr(36, url.to_string()));
         }
     };
     db.set_connect_options(conn);

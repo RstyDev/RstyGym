@@ -16,11 +16,18 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
-
+.input_pair {
+  display: flex;
+  flex-direction: row;
+  & * {
+    width: 49%;
+  }
+}
 .series_container {
   border: #e8e8e8 solid 1px;
   border-radius: 10px;
   padding: 5px;
+  margin-top: 2px;
   & p {
     margin-bottom: 5px;
     margin-top: 0;
@@ -39,6 +46,11 @@
 .frame {
   border: solid #bbb;
   border-radius: 10px;
+}
+
+#body {
+  overflow-y: auto;
+  margin-bottom: 50px;
 }
 
 .logo {

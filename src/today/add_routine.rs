@@ -1,16 +1,16 @@
+use crate::commands::NewRoutine;
+use crate::libs::{call, log};
 use crate::today::add_exercise::AddExercise;
 use chrono::{Days, Local};
 use serde_wasm_bindgen::from_value;
-use sycamore::futures::spawn_local_scoped;
 use structs::day_template::DayTemplate;
 use structs::exercise::Exercise;
 use structs::routine::Routine;
 use structs::week::Week;
+use sycamore::futures::spawn_local_scoped;
 use sycamore::prelude::*;
 use sycamore::rt::{console_error, spawn_local};
 use web_sys::MouseEvent;
-use crate::commands::NewRoutine;
-use crate::libs::{call, log};
 
 #[derive(Clone, Copy, PartialEq, Default)]
 enum State {
@@ -20,14 +20,22 @@ enum State {
     AddingDayTemplate,
     AddingExercise,
 }
-fn new_routine(name: String, mut rtn: Routine, routine: Signal<Option<Routine>>){
+fn new_routine(name: String, mut rtn: Routine, routine: Signal<Option<Routine>>) {
     spawn_local_scoped(async move {
-        match call::<i64>("new_routine", Some(NewRoutine { name, routine: rtn.clone() })).await{
+        match call::<i64>(
+            "new_routine",
+            Some(NewRoutine {
+                name,
+                routine: rtn.clone(),
+            }),
+        )
+        .await
+        {
             Ok(id) => {
                 rtn.set_id(id);
                 routine.set(Some(rtn));
             }
-            Err(e) => console_error!("{e}")
+            Err(e) => console_error!("{e}"),
         }
     });
 }
@@ -76,8 +84,8 @@ pub fn AddRoutine(routine: Signal<Option<Routine>>) -> View {
     let dy = dy5.clone();
     let dy_selector = create_selector(move || dy.with(|d| d.exercises().len() > 0));
     let dy_selector2 = dy_selector.clone();
-    create_memo(move || log("WeekTemplate",79,&tmp4.get_clone()));
-    create_memo(move || log("DayTemplate",80,&dy4.get_clone()));
+    create_memo(move || log("WeekTemplate", 79, &tmp4.get_clone()));
+    create_memo(move || log("DayTemplate", 80, &dy4.get_clone()));
     let rtn1 = routine.clone();
     let (s1, s2, s3, s4, s5, s6, s7, s8) = (
         state.clone(),
@@ -91,7 +99,7 @@ pub fn AddRoutine(routine: Signal<Option<Routine>>) -> View {
     );
 
     let state_selector = create_selector(move || state.get());
-    create_memo(move || log("Exercise",94,&ex1.get_clone()));
+    create_memo(move || log("Exercise", 94, &ex1.get_clone()));
     view! {
         (match state_selector.get(){
             State::NotAdding => view!{},

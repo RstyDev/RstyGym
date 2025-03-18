@@ -1,10 +1,9 @@
+use crate::libs::log;
 use crate::today::Today;
 use crate::{libs::call, menu::Menu};
 use serde::{Deserialize, Serialize};
 use structs::routine::Routine;
-use sycamore::{futures::spawn_local_scoped, prelude::*, web::events::SubmitEvent};
-use wasm_bindgen::prelude::*;
-use crate::libs::log;
+use sycamore::{futures::spawn_local_scoped, prelude::*};
 
 #[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Debug)]
 pub enum Selector {
@@ -15,11 +14,11 @@ pub enum Selector {
 async fn get_state() -> Option<Routine> {
     match call::<Option<Routine>>("get_state", None::<bool>).await {
         Ok(d) => {
-            log("Ok Routine",18,&d);
+            log("Ok Routine", 18, &d);
             d
         }
         Err(e) => {
-            log("Err Routine",22,&e);
+            log("Err Routine", 22, &e);
             None
         }
     }
@@ -36,7 +35,7 @@ pub fn App() -> View {
     let r2 = routine.clone();
     spawn_local_scoped(async move {
         let res = get_state().await;
-        log("Updating Routine",38,&res);
+        log("Updating Routine", 38, &res);
         r.set(res)
     });
     view! {
@@ -53,14 +52,15 @@ pub fn App() -> View {
                     img(src="public/sycamore.svg", class="logo sycamore", alt="Sycamore logo")
                 }
             }
-
-            (match menu_selector.get(){
-                Selector::Today => view!{
-                    Today(routine = r2.clone())
-                },
-                Selector::Registry => {view!{}}
-                Selector::Config => {view!{}}
-            })
+            section(id="body"){
+                (match menu_selector.get(){
+                    Selector::Today => view!{
+                        Today(routine = r2.clone())
+                    },
+                    Selector::Registry => {view!{}}
+                    Selector::Config => {view!{}}
+                })
+            }
             Menu(menu = menu)
         }
     }

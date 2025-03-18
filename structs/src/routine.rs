@@ -1,3 +1,4 @@
+use crate::day::Day;
 use crate::{
     day_template::DayTemplate,
     error::{AppError, AppRes as Res},
@@ -5,7 +6,6 @@ use crate::{
 };
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
-use crate::day::Day;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Routine {
@@ -71,14 +71,17 @@ impl Routine {
         }
     }
     pub fn today(&self) -> Option<&Day> {
-        self.weeks().into_iter().find_map(|w|w.today())
+        self.weeks().into_iter().find_map(|w| w.today())
+    }
+    pub fn last_day(&self, today: &Day) -> Option<&Day> {
+        self.weeks().into_iter().find_map(|w| w.last_same_as(today))
     }
     pub fn this_week_mut(&mut self) -> Option<&mut Week> {
         let mut res = None;
         let len = self.weeks.len();
 
         for i in 0..len {
-            if self.weeks[i].is_current(){
+            if self.weeks[i].is_current() {
                 res = Some(&mut self.weeks[i]);
                 break;
             }

@@ -1,10 +1,10 @@
+use crate::day::DayState;
 use crate::{
     day::Day,
     error::{AppError, AppRes as Res},
 };
 use chrono::{Datelike, Days, Local, NaiveDate, Weekday};
 use serde::{Deserialize, Serialize};
-use crate::day::DayState;
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct Week {
@@ -31,21 +31,26 @@ impl Week {
         ];
         let mut past = false;
         for i in 0..days.len() {
-            let  day = day.checked_add_days(Days::new(i as u64)).unwrap();
+            let day = day.checked_add_days(Days::new(i as u64)).unwrap();
             if day.weekday() == Weekday::Sun {
                 past = true;
             }
 
             if past {
-                days[i] = Day::build(None, DayState::Free, day.checked_add_days(Days::new(1)).unwrap(), vec![]);
+                days[i] = Day::build(
+                    None,
+                    DayState::Free,
+                    day.checked_add_days(Days::new(1)).unwrap(),
+                    vec![],
+                );
             } else {
                 days[i] = Day::build(None, DayState::Free, day, vec![]);
             }
         }
-        Week{
+        Week {
             id: i64::default(),
             completed: false,
-            days
+            days,
         }
     }
     pub fn id(&self) -> &i64 {
@@ -71,21 +76,31 @@ impl Week {
         }
     }
     pub fn today(&self) -> Option<&Day> {
-        self.days().into_iter().find(|d|{d.date() == &Local::now().date_naive()})
+        self.days()
+            .into_iter()
+            .find(|d| d.date() == &Local::now().date_naive())
     }
     pub fn today_mut(&mut self) -> Option<&mut Day> {
         let mut res = None;
         for i in 0..self.days.len() {
             if self.days[i].date() == &Local::now().date_naive() {
                 res = Some(&mut self.days[i]);
-                break
+                break;
             }
         }
         res
     }
     pub fn set_today(&mut self, day: Day) {
-        let i = self.days().into_iter().enumerate().find_map(|d|(d.1.date() == &Local::now().date_naive()).then_some(d.0)).unwrap();
+        let i = self
+            .days()
+            .into_iter()
+            .enumerate()
+            .find_map(|d| (d.1.date() == &Local::now().date_naive()).then_some(d.0))
+            .unwrap();
         self.days[i] = day;
+    }
+    pub fn last_same_as(&self, day: &Day) -> Option<&Day> {
+        self.days().into_iter().rev().find(|&d|d.exercises() == day.exercises() && d.date() != day.date() )
     }
     pub fn set_days(&mut self, days: [Day; 6]) {
         self.days = days;

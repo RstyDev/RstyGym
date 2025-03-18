@@ -1,6 +1,6 @@
-use std::fmt::{Debug, Display};
 use serde::{Serialize, de::DeserializeOwned};
 use serde_wasm_bindgen::{from_value, to_value};
+use std::fmt::{Debug, Display};
 use sycamore::prelude::console_log;
 use wasm_bindgen::{JsValue, prelude::wasm_bindgen};
 
@@ -13,7 +13,7 @@ extern "C" {
 }
 
 pub fn log(msg: impl Display, line: u16, args: &impl Debug) {
-    console_log!("{msg}: \nLine {}\n{:#?}",line.to_string(),args)
+    console_log!("{msg}: \nLine {}\n{:#?}", line.to_string(), args)
 }
 
 pub async fn call<T: DeserializeOwned>(

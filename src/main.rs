@@ -1,8 +1,8 @@
 mod app;
+mod commands;
 mod libs;
 mod menu;
 mod today;
-mod commands;
 
 use app::App;
 
