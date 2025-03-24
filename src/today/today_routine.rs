@@ -50,21 +50,24 @@ pub fn TodayRoutine(routine: Signal<Option<Routine>>) -> View {
                         series.clone().map(move |sr|{
                             let signal = create_signal(
                             series.as_ref().map(|s|s.weight().unwrap_or(&0.0).to_string()).unwrap_or_default());
-                            let input_value = format!("Last: {}",last_series.map(|s|{s.weight().map(|w|w.to_string()).unwrap_or(String::from("-"))}).unwrap_or(String::from("-")));
+                            let input_value = last_series.map(|s|{s.weight().map(|w|w.to_string()).unwrap_or(String::from("-"))}).unwrap_or(String::from("-"));
                             let s1 = signal.clone();
                             create_effect(move ||{
-                                let weight = match signal.get_clone().parse::<f32>(){
-                                    Ok(f) => f,
-                                    Err(e) => {console_error!("Error: {e}");0.0}
-                                };
-                                // let weight = signal.with(|s|s.parse::<f32>().unwrap());
-                                spawn_local_scoped(async move {
-                                    call::<()>("update_weight",Some(UpdateWeight{
-                                        exerciseIndex: ex_index as u8,
-                                        index: i as u8,
-                                        weight
-                                    })).await.unwrap();
-                                })
+                                let input = signal.get_clone();
+                                if input.len()>0 {
+                                    let weight = match input.parse::<f32>(){
+                                        Ok(f) => f,
+                                        Err(e) => {console_error!("Error: {e}");0.0}
+                                    };
+                                    // let weight = signal.with(|s|s.parse::<f32>().unwrap());
+                                    spawn_local_scoped(async move {
+                                        call::<()>("update_weight",Some(UpdateWeight{
+                                            exerciseIndex: ex_index as u8,
+                                            index: i as u8,
+                                            weight
+                                        })).await.unwrap();
+                                    })
+                                }
                             });
                             (signal.clone(),view!{
                                 section(class = "input_pair"){
@@ -72,12 +75,15 @@ pub fn TodayRoutine(routine: Signal<Option<Routine>>) -> View {
                                         disabled = true,
                                         value = input_value,
                                     )
-                                    input(
-                                        bind:value=signal,
-                                        r#type = "number",
-                                        step = "0,01",
-                                        placeholder = sr.weight().as_ref().map(|w|w.to_string()).unwrap_or_default()
-                                    ){}
+                                    article(){
+                                        input(
+                                            bind:value=signal,
+                                            r#type = "number",
+                                            step = "0,01",
+                                            placeholder = sr.weight().as_ref().map(|w|w.to_string()).unwrap_or_default()
+                                        ){}
+                                        input(disabled = true, value = "Kg"){}
+                                    }
                                 }
                             })
                         })
@@ -86,6 +92,10 @@ pub fn TodayRoutine(routine: Signal<Option<Routine>>) -> View {
                     view!{
                         section(class = "series_container"){
                             p(){(name)}
+                            section(class="input_pair"){
+                                input(disabled = true, value = "Last"){}
+                                input(disabled = true, value = "Current"){}
+                            }
                             (views)
                         }
                     }
