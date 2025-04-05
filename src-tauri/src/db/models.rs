@@ -2,6 +2,7 @@ use crate::db::db;
 use chrono::{Local, NaiveDate};
 use sqlx::{FromRow, Pool, Sqlite, query, query_as};
 use std::sync::Arc;
+use tauri::AppHandle;
 use structs::{
     day::{Day, DayState},
     day_template::DayTemplate,
@@ -18,8 +19,8 @@ pub struct App {
 }
 
 impl App {
-    pub async fn get() -> Res<App> {
-        let db = Arc::new(db().await?);
+    pub async fn get(handle: &AppHandle) -> Res<App> {
+        let db = Arc::new(db(handle).await?);
         Ok(App {
             name: "Lucas".to_string(),
             routine: Routine::get(db.as_ref()).await?,

@@ -62,7 +62,7 @@ pub fn TodayRoutine(routine: Signal<Option<Routine>>) -> View {
                                     // let weight = signal.with(|s|s.parse::<f32>().unwrap());
                                     spawn_local_scoped(async move {
                                         call::<()>("update_weight",Some(UpdateWeight{
-                                            exerciseIndex: ex_index as u8,
+                                            exercise_index: ex_index as u8,
                                             index: i as u8,
                                             weight
                                         })).await.unwrap();

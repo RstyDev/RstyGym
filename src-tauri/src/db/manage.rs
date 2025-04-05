@@ -4,12 +4,16 @@ use sqlx::{
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
 };
 use std::str::FromStr;
+use tauri::{AppHandle, Manager};
 use structs::error::{AppError, AppRes as Res};
-pub async fn db() -> Res<Pool<Sqlite>> {
-    let url = "sqlite://sqlite.db";
+pub async fn db(handle: &AppHandle) -> Res<Pool<Sqlite>> {
+    let path = handle.path().app_local_data_dir().map_err(|e|AppError::DBErr(10,e.to_string()))?;
+    println!("{:?}", path.to_str().unwrap());
+    let url = format!("sqlite://{}sqlite.db",path.to_str().unwrap());
+    //let url = "sqlite://sqlite.db";
     let mut exists = true;
-    if !Sqlite::database_exists(url).await.unwrap_or(false) {
-        match Sqlite::create_database(url).await {
+    if !Sqlite::database_exists(url.as_str()).await.unwrap_or(false) {
+        match Sqlite::create_database(url.as_str()).await {
             Ok(_) => {
                 exists = false;
             }
@@ -17,23 +21,23 @@ pub async fn db() -> Res<Pool<Sqlite>> {
         }
     }
 
-    let conn = match SqliteConnectOptions::from_str(url) {
+    let conn = match SqliteConnectOptions::from_str(url.as_str()) {
         Ok(a) => a
             .journal_mode(SqliteJournalMode::Wal)
             .create_if_missing(true),
         Err(e) => {
             println!("{}", e);
-            return Err(AppError::DBErr(26, url.to_string()));
+            return Err(AppError::DBErr(26, url.clone()));
         }
     }
     .journal_mode(SqliteJournalMode::Wal)
     .create_if_missing(true);
 
-    let db = match SqlitePool::connect(url).await {
+    let db = match SqlitePool::connect(url.as_str()).await {
         Ok(o) => o,
         Err(e) => {
             println!("{e}");
-            return Err(AppError::DBErr(36, url.to_string()));
+            return Err(AppError::DBErr(36, url));
         }
     };
     db.set_connect_options(conn);

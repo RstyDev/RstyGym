@@ -2,14 +2,12 @@ mod db;
 
 use db::App;
 use structs::{day::Day, error::StrRes as Res, routine::Routine};
-use tauri::{
-    State,
-    async_runtime::{Mutex, block_on},
-};
+use tauri::{State, async_runtime::{Mutex, block_on}, AppHandle, Manager};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
-async fn check_in(app: State<'_, Mutex<App>>) -> Res<(Day, Option<Day>)> {
+async fn check_in(app: State<'_, Mutex<App>>, handle: AppHandle) -> Res<(Day, Option<Day>)> {
+    let res = handle.path().app_local_data_dir().map_err(|e|e.to_string())?;
     let mut lock = app.lock().await;
     lock.check_in().await.map_err(|e| e.to_string())?;
     let routine = lock.routine().unwrap();
@@ -40,15 +38,27 @@ async fn  update_weight(app: State<'_, Mutex<App>>, exercise_index: u8, index: u
 }
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
-        .manage(Mutex::new(block_on(App::get()).unwrap()))
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             check_in,
             get_state,
             new_routine,
             update_weight,
-        ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        ]).build(tauri::generate_context!()).expect("error while running tauri application");
+    let handle = app.handle();
+    app.manage(Mutex::new(block_on(App::get(handle)).unwrap()));
+    app.run(|_a,_ev|{});
+    // let res = app.invoke_handler(|a|{a.});
+    // tauri::Builder::default()
+    //     .plugin(tauri_plugin_shell::init())
+    //     .invoke_handler(tauri::generate_handler![
+    //         check_in,
+    //         get_state,
+    //         new_routine,
+    //         update_weight,
+    //     ])
+    //     .manage(Mutex::new(block_on(App::get()).unwrap()))
+    //     .run(tauri::generate_context!())
+    //     .expect("error while running tauri application");
 }
