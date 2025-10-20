@@ -1,0 +1,42 @@
+[package]
+name = "rsty_gym"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+#SSR
+actix-cors = { version = "0.7.0", optional = true }
+actix-web = { version = "4.9.0", optional = true }
+actix-web-httpauth = { version = "0.8.2", optional = true }
+actix-ws = { version = "0.3.0", optional = true }
+surrealdb = { version = "2.2.2", optional = true }
+jsonwebtoken = { version = "9.3.1", optional = true }
+#sync-trait = { version = "0.1.88", optional = true }
+
+#shuttle-actix-web = { version = "0.52.0", optional = true }
+#shuttle-runtime = { version = "0.52.0", optional = true }
+#Both
+dotenv = { version = "0.15.0", optional = false }
+cfg-if = "1"
+chrono = {version= "0.4.40" ,features = ["serde"] }
+serde = { version = "1.0.219", features = ["derive"] }
+thiserror = { version = "2.0.12", features = ["default"] }
+#CSR
+sycamore = { version = "0.9.1", features = ["suspense"], optional = true }
+wasm-bindgen = { version = "0.2.100", optional = true }
+wasm-bindgen-futures = { version = "0.4.50", optional = true }
+serde-wasm-bindgen = { version = "0.6.5", optional = true }
+console_error_panic_hook = { version = "0.1.7", optional = true }
+reqwest = { version = "0.12", features = ["json"], optional = true }
+async-std = { version = "1.13.0", optional = false }
+web-sys = { version = "0.3.77", optional = true, features = ["WebSocket", 'Window', 'Document', 'HtmlDocument'] }
+regex = { version = "1.11.2" }
+
+
+[features]
+ssr = ["dep:actix-cors", "dep:actix-web", "dep:actix-ws", "dep:surrealdb", "dep:actix-web-httpauth", "dep:jsonwebtoken",
+    #    , "dep:shuttle-actix-web", "dep:shuttle-runtime" ,"dep:dotenv", "dep:async-trait"
+]
+csr = ["dep:wasm-bindgen", "dep:sycamore", "dep:wasm-bindgen-futures", "dep:serde-wasm-bindgen",
+    #"dep:async-std",
+    "dep:console_error_panic_hook", "dep:reqwest", "dep:web-sys"]
