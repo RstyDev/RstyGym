@@ -44,9 +44,7 @@ impl From<String> for TokenType {
 
 #[derive(Serialize, Deserialize, Clone, Default, PartialEq)]
 pub struct LoginForm {
-    pub nombre: String,
-    pub apellido: String,
-    pub password: String,
+    pub device: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]

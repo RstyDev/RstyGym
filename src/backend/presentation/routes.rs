@@ -8,6 +8,7 @@ use actix_web::web;
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use actix_web_httpauth::middleware::HttpAuthentication;
 use std::env;
+use crate::backend::presentation::handlers::{validator, login, refresh_token, register, save_exercise, get_exercises};
 
 pub fn root_routes(config: &mut web::ServiceConfig) {
     let (auth, auth2,auth3) = (
@@ -15,12 +16,13 @@ pub fn root_routes(config: &mut web::ServiceConfig) {
         HttpAuthentication::with_fn(move |a, b: Option<BearerAuth>| validator(a, b)),
         HttpAuthentication::with_fn(move |a, b: Option<BearerAuth>| validator(a, b)),
     );
+    let origin = env::var(String::from("ORIGIN")).unwrap();
     let (cors, cors2, cors3) = (
-        Cors::default().allowed_origin(&env::var("ORIGIN").unwrap()),
-        Cors::default().allowed_origin(&env::var("ORIGIN").unwrap()),
-        Cors::default().allowed_origin(&env::var("ORIGIN").unwrap()),
+        Cors::default().allowed_origin(&origin),
+        Cors::default().allowed_origin(&origin),
+        Cors::default().allowed_origin(&origin),
     );
-    let (cors, cors2,cors3) = match &env::var("ORIGIN_SECOND") {
+    let (cors, cors2,cors3) = match &env::var(String::from("ORIGIN_SECOND")) {
         Ok(var) => (
             cors.allowed_origin(var)
                 .allow_any_method()
@@ -47,35 +49,38 @@ pub fn root_routes(config: &mut web::ServiceConfig) {
     config
         .service(login)
         .service(refresh_token)
+        .service(register)
         .service(
-            web::scope("/api/v1/users")
+            web::scope("/routines")
                 .wrap(cors)
                 .wrap(auth)
-                .service(register_user_handler)
-                .service(all_users)
-                .service(user_by_id)
-                .service(delete_user)
-                .service(update_user)
-                .service(change_password),
+                // .service(register_user_handler)
+                // .service(all_users)
+                // .service(user_by_id)
+                // .service(delete_user)
+                // .service(update_user)
+                // .service(change_password),
         )
         .service(
-            web::scope("/api/v1/families")
+            web::scope("/days")
                 .wrap(cors2)
                 .wrap(auth2)
-                .service(all_families)
-                .service(delete_family)
-                .service(family_by_id)
-                .service(register_family)
-                .service(update_family)
+                // .service(all_families)
+                // .service(delete_family)
+                // .service(family_by_id)
+                // .service(register_family)
+                // .service(update_family)
         )
-        .service(web::scope("/api/v1/books")
+        .service(web::scope("/exercises")
                      .wrap(cors3)
                      .wrap(auth3)
-                     .service(get_all_books)
-                     .service(get_book_by_id)
-                     .service(delete_book)
-                     .service(update_book)
-                     .service(register_book)
+                     .service(save_exercise)
+                     .service(get_exercises)
+                     // .service(get_all_books)
+                     // .service(get_book_by_id)
+                     // .service(delete_book)
+                     // .service(update_book)
+                     // .service(register_book)
                  ,
                  /*
                  delete_family

@@ -1,8 +1,7 @@
 use crate::backend::infrastructure::db::establish_connection;
-use crate::backend::infrastructure::prefill::prefill;
-use crate::backend::infrastructure::repositories::{SurrealBookRepository, SurrealFamilyRepository};
+use crate::backend::infrastructure::repositories::{SurrealRoutineRepository, SurrealExerciseRepository, SurrealDayRepository};
 use crate::backend::{
-    infrastructure::repositories::SurrealUserRepository, presentation::routes::root_routes,
+    presentation::routes::root_routes,
 };
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
@@ -10,43 +9,36 @@ use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use dotenv::dotenv;
 use std::env;
-use std::sync::Arc;
+
 
 pub async fn run() -> std::io::Result<()> {
     dotenv().ok();
-    let repo = SurrealUserRepository::new().await;
-    let family_repo = SurrealFamilyRepository::new().await;
-    let book_repo = SurrealBookRepository::new().await;
+    let routine_repo = SurrealRoutineRepository::new().await;
+    let day_repo = SurrealDayRepository::new().await;
+    let exercise_repo = SurrealExerciseRepository::new().await;
     let db = establish_connection().await;
-    if env::var("PREFILL").unwrap().eq_ignore_ascii_case("true") {
+    if env::var(String::from("PREFILL")).unwrap().eq_ignore_ascii_case("true") {
         db.query(r#"
             remove table if exists exercise;
             remove table if exists day;
             remove table if exists routine;
-            // remove table if exists familias;
+            remove table if exists gym;
         "#).await.unwrap();
-        prefill(Arc::from(repo.clone()), Arc::from(book_repo.clone()), Arc::from(family_repo.clone())).await;
-        if let Ok(church_name) = env::var("CHURCH_NAME") {
-            let denomination = env::var("DENOMINATION").unwrap();
-            let presbytery = env::var("PRESBYTERY").unwrap();
+        if let Ok(gym_name) = env::var(String::from("GYM_NAME")) {
             db.query(r#"
-                INSERT INTO iglesia {
-                    nombre: $church_name,
-                    denominacion: $denomination,
-                    presbiterio: $presbytery
+                INSERT INTO gym {
+                    nombre: $gym_name
                 }"#)
-                .bind(("church_name",church_name))
-                .bind(("denomination",denomination))
-                .bind(("presbytery",presbytery)).await.unwrap();
+                .bind(("gym_name",gym_name)).await.unwrap();
 
         }
     }
-    let app_data = Data::new(repo);
+    let app_data = Data::new(routine_repo);
     println!("Starting...");
 
     let app = HttpServer::new(move || {
-        let cors = Cors::default().allowed_origin(&env::var("ORIGIN").unwrap());
-        let cors = match &env::var("ORIGIN_SECOND") {
+        let cors = Cors::default().allowed_origin(&env::var(String::from("ORIGIN")).unwrap());
+        let cors = match &env::var(String::from("ORIGIN_SECOND")) {
             Ok(var) => cors
                 .allowed_origin(var)
                 .allow_any_method()
@@ -57,14 +49,14 @@ pub async fn run() -> std::io::Result<()> {
 
         App::new()
             .app_data(app_data.to_owned())
-            .app_data(Data::new(family_repo.to_owned()))
-            .app_data(Data::new(book_repo.to_owned()))
+            .app_data(Data::new(day_repo.to_owned()))
+            .app_data(Data::new(exercise_repo.to_owned()))
             .app_data(Data::new(db.to_owned()))
             .wrap(Logger::default())
             .wrap(cors)
             .configure(|config| root_routes(config))
     })
-        .bind((env::var("HOST").expect("HOST not set").as_str(), 8088))?;
+        .bind((env::var(String::from("HOST")).expect("HOST not set").as_str(), 8088))?;
     println!("Running!");
     app.run().await
 }

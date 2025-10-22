@@ -1,6 +1,10 @@
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
+#[cfg(feature = "ssr")]
+use surrealdb::RecordId;
+#[cfg(feature = "ssr")]
+use crate::backend::infrastructure::db::DayDB;
 use crate::entities::Exercise;
 
 
@@ -43,7 +47,27 @@ impl From<String> for DayState {
 }
 
 impl Day {
+    pub fn new(id: Option<String>, state: DayState, date: NaiveDate, exercises: Vec<Exercise>) -> Self {
+        Self { id, state, date, exercises }
+    }
+    pub fn id(&self) -> Option<&String> {
+        self.id.as_ref()
+    }
+    #[cfg(feature = "ssr")]
+    pub fn record(&self) -> Option<RecordId> {
+        self.id.as_ref().map(|id|RecordId::from(("days",id)))
+    }
+
+    pub fn state(&self) -> DayState {
+        self.state
+    }
+
+    pub fn date(&self) -> NaiveDate {
+        self.date
+    }
     pub fn exercises(&self) -> &Vec<Exercise> {
         &self.exercises
     }
+
 }
+

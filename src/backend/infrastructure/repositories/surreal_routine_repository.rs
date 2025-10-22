@@ -1,0 +1,82 @@
+use crate::{
+    backend::{
+        domain::repositories::RoutineRepository,
+        infrastructure::db::{establish_connection, DBPool},
+    },
+    entities::Routine,
+    error::{AppError, AppRes},
+};
+use crate::backend::infrastructure::db::RoutineDB;
+use std::sync::Arc;
+
+
+#[derive(Clone)]
+pub struct SurrealRoutineRepository {
+    pool: DBPool,
+}
+
+impl SurrealRoutineRepository {
+    pub async fn new() -> Self {
+        Self {
+            pool: establish_connection().await,
+        }
+    }
+}
+/*
+    id: Option<String>,
+    templates: Vec<DayTemplate>,
+    weeks: [Week; 4],
+    last_check_in: NaiveDate,
+    last_day: NaiveDate,
+    created_by: String,
+    created_at: NaiveDate,*/
+impl RoutineRepository for Arc<SurrealRoutineRepository> {
+    async fn save(&self, routine: Routine) -> AppRes<()> {
+        let routine = RoutineDB::from(routine);
+        // let res = self.pool.insert(&routine).await;
+        let res = self
+            .pool
+            .query(
+                r#"
+        insert into routines {
+            templates: $templates,
+            week: $week,
+            last_check_in: $last_check_in,
+            last_day: $last_day,
+            created_by: $created_by,
+            created_at: $created_at,
+        }
+        "#,
+            )
+            .bind(("templates", routine.templates().to_owned()))
+            .bind(("week", routine.weeks().to_owned()))
+            .bind(("last_check_in",routine.last_check_in()))
+            .bind(("last_day",routine.last_day()))
+            .bind(("created_by",routine.created_by().to_owned()))
+            .bind(("created_at",routine.created_at()))
+            .await;
+        match res {
+            Ok(a) => {
+                println!("{:#?}", a);
+                Ok(())
+            }
+            Err(e) => Err(AppError::DBErr(56, e.to_string())),
+        }
+    }
+
+    async fn delete(&self, id: &str) -> AppRes<()> {
+        Err(AppError::IndexErr(1))
+    }
+
+    async fn get_all(&self) -> AppRes<Vec<Routine>> {
+        Err(AppError::IndexErr(1))
+    }
+
+    async fn get_by_user(&self, id: &str) -> AppRes<Vec<Routine>> {
+        Err(AppError::IndexErr(1))
+    }
+
+    async fn update(&self, persona: &Routine) -> AppRes<Routine> {
+        Err(AppError::IndexErr(1))
+    }
+}

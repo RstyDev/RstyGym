@@ -20,6 +20,7 @@ dotenv = { version = "0.15.0", optional = false }
 cfg-if = "1"
 chrono = {version= "0.4.40" ,features = ["serde"] }
 serde = { version = "1.0.219", features = ["derive"] }
+
 thiserror = { version = "2.0.12", features = ["default"] }
 #CSR
 sycamore = { version = "0.9.1", features = ["suspense"], optional = true }
@@ -31,6 +32,8 @@ reqwest = { version = "0.12", features = ["json"], optional = true }
 async-std = { version = "1.13.0", optional = false }
 web-sys = { version = "0.3.77", optional = true, features = ["WebSocket", 'Window', 'Document', 'HtmlDocument'] }
 regex = { version = "1.11.2" }
+uuid = { version = "1.18.1", features = ["v4"] }
+serde_json = "1.0.145"
 
 
 [features]

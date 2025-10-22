@@ -14,13 +14,10 @@ impl <T: RoutineRepository> RoutineService<T> {
     pub async fn get_all(&self) -> AppRes<Vec<Routine>> {
         self.book_repo.get_all().await
     }
-    pub async fn get_by_id(&self, id: &str) -> AppRes<Option<Routine>> {
-        self.book_repo.get_by_id(id).await
-    }
     pub async fn get_by_user(&self, user: &str) -> AppRes<Vec<Routine>> {
         self.book_repo.get_by_user(user).await
     }
-    pub async fn save(&self, routine: &Routine) -> AppRes<()> {
+    pub async fn save(&self, routine: Routine) -> AppRes<()> {
         self.book_repo.save(routine).await
     }
     pub async fn delete(&self, id: &str) -> AppRes<()> {
