@@ -1,7 +1,7 @@
 use crate::backend::domain::repositories::ExerciseRepository;
 use crate::backend::domain::services::ExerciseService;
 use crate::entities::Exercise;
-use crate::error::AppRes;
+use crate::utils::error::AppRes;
 
 pub struct SaveExerciseUseCase<T: ExerciseRepository> {
     service: ExerciseService<T>,

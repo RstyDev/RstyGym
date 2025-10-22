@@ -5,9 +5,9 @@ use crate::{
         infrastructure::db::{establish_connection, DBPool},
     },
     entities::Exercise,
-    error::{AppError, AppRes},
 };
 use crate::backend::infrastructure::db::ExerciseDB;
+use crate::utils::error::{AppError, AppRes};
 
 #[derive(Clone)]
 pub struct SurrealExerciseRepository {

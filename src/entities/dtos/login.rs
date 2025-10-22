@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
+use crate::string;
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Claims {
@@ -26,8 +27,8 @@ impl Display for TokenType {
 impl Into<String> for TokenType {
     fn into(self) -> String {
         match self {
-            TokenType::Refresh => String::from("refresh"),
-            TokenType::Normal => String::from("normal"),
+            TokenType::Refresh => string!("refresh"),
+            TokenType::Normal => string!("normal"),
         }
     }
 }

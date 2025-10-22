@@ -4,10 +4,12 @@ use crate::{
         infrastructure::db::{establish_connection, DBPool},
     },
     entities::Routine,
-    error::{AppError, AppRes},
 };
 use crate::backend::infrastructure::db::RoutineDB;
 use std::sync::Arc;
+use surrealdb::RecordId;
+use crate::entities::DayTemplate;
+use crate::utils::error::{AppError, AppRes};
 
 
 #[derive(Clone)]
@@ -32,7 +34,11 @@ impl SurrealRoutineRepository {
     created_at: NaiveDate,*/
 impl RoutineRepository for Arc<SurrealRoutineRepository> {
     async fn save(&self, routine: Routine) -> AppRes<()> {
-        let routine = RoutineDB::from(routine);
+        let routine: RoutineDB = routine.into();
+        // let routine = RoutineDB::from(routine);
+        let templates = routine.templates().into_iter().map(|DayTemplate(ex)|{
+            ex.into_iter().map(|ex|ex.record()).collect::<Vec<Option<RecordId>>>()
+        }).collect::<Vec<_>>();
         // let res = self.pool.insert(&routine).await;
         let res = self
             .pool
@@ -48,7 +54,7 @@ impl RoutineRepository for Arc<SurrealRoutineRepository> {
         }
         "#,
             )
-            .bind(("templates", routine.templates().to_owned()))
+            .bind(("templates", templates))
             .bind(("week", routine.weeks().to_owned()))
             .bind(("last_check_in",routine.last_check_in()))
             .bind(("last_day",routine.last_day()))

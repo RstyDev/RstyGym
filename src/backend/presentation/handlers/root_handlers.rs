@@ -1,7 +1,7 @@
 use crate::{
+    string,
     backend::infrastructure::db::{DBPool, Record},
     entities::{Claims, LoginForm, LoginResult, RefreshResult, TokenType},
-    error::AppError,
 };
 use actix_web::{dev::ServiceRequest, error::{self, Error as ActixError}, get, post, web::{Data, Json}, HttpResponse, Responder};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
@@ -10,9 +10,7 @@ use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation}
 use std::env;
 use serde::{Deserialize, Serialize};
 use surrealdb::{RecordId, Uuid};
-
-
-
+use crate::utils::error::AppError;
 
 #[get("/register")]
 pub async fn register(db: Data<DBPool>) -> impl Responder {
@@ -63,8 +61,8 @@ async fn loc_register(db: Data<DBPool>) -> HttpResponse {
 fn get_token(duration: Duration, tipo: TokenType, id: String) -> String {
     let now = Utc::now();
     let secret = match tipo {
-        TokenType::Refresh => env::var(String::from("REFRESH_SECRET")).unwrap(),
-        TokenType::Normal => env::var(String::from("SECRET")).unwrap(),
+        TokenType::Refresh => env::var(string!("REFRESH_SECRET")).unwrap(),
+        TokenType::Normal => env::var(string!("SECRET")).unwrap(),
     };
     let claims = Claims {
         nbf: now.timestamp() as usize,
@@ -83,8 +81,8 @@ fn get_token(duration: Duration, tipo: TokenType, id: String) -> String {
 
 fn validate_token(token: String, tipo: TokenType) -> Result<Claims, AppError> {
     let secret = match tipo {
-        TokenType::Refresh => env::var(String::from("REFRESH_SECRET")).unwrap(),
-        TokenType::Normal => env::var(String::from("SECRET")).unwrap(),
+        TokenType::Refresh => env::var(string!("REFRESH_SECRET")).unwrap(),
+        TokenType::Normal => env::var(string!("SECRET")).unwrap(),
     };
     let decoding_key = DecodingKey::from_secret(secret.as_bytes());
     let res = decode(&token, &decoding_key, &Validation::default());
@@ -117,11 +115,11 @@ pub async fn validator(
     credenciales: Option<BearerAuth>,
 ) -> Result<ServiceRequest, (ActixError, ServiceRequest)> {
     let Some(cred) = credenciales else {
-        return Err((error::ErrorBadRequest(String::from("No se recibió el token")), req));
+        return Err((error::ErrorBadRequest(string!("No se recibió el token")), req));
     };
     let token = cred.token().to_string();
     match validate_token(token, TokenType::Normal) {
         Ok(_) => Ok(req),
-        Err(_) => Err((error::ErrorForbidden(String::from("No tiene acceso")), req)),
+        Err(_) => Err((error::ErrorForbidden(string!("No tiene acceso")), req)),
     }
 }

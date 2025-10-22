@@ -4,10 +4,12 @@ use crate::{
         infrastructure::db::{establish_connection, DBPool},
     },
     entities::Day,
-    error::{AppError, AppRes},
 };
 use crate::backend::infrastructure::db::DayDB;
 use std::sync::Arc;
+use surrealdb::RecordId;
+use crate::entities::Exercise;
+use crate::utils::error::{AppError, AppRes};
 
 #[derive(Clone)]
 pub struct SurrealDayRepository {
@@ -71,5 +73,27 @@ impl DayRepository for Arc<SurrealDayRepository> {
 
     async fn update(&self, day: &Day) -> AppRes<Day> {
         Err(AppError::IndexErr(1))
+    }
+    async fn update_exercises(&self, id: String, exercises: Vec<Exercise>) -> AppRes<Day> {
+
+        let res = self.pool.query(r#"
+            UPDATE $id CONTENT {
+                exercises: $exercises,
+            }
+        "#).bind(("id",RecordId::from(("days",id))))
+            .bind(("exercises",exercises))
+            .await;
+        match res {
+            Ok(mut res) => {
+                let record: Option<Day> = res.take(0usize).unwrap();
+                println!("Res: {:?}", record);
+                if let Some(rec) = record {
+                    Ok(rec)
+                } else {
+                    Err(AppError::NotFound(93))
+                }
+            },
+            Err(e) => Err(AppError::ValidationErr(96,e.to_string())),
+        }
     }
 }

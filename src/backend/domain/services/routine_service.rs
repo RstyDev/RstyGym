@@ -1,6 +1,7 @@
 use crate::backend::domain::repositories::RoutineRepository;
 use crate::entities::Routine;
-use crate::error::AppRes;
+use crate::utils::error::AppRes;
+
 
 #[derive(Clone)]
 pub struct RoutineService<T: RoutineRepository> {

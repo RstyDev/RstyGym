@@ -30,7 +30,14 @@ pub struct WeekDB {
 
 impl From<Week> for WeekDB {
     fn from(value: Week) -> Self {
-        value.into()
+        WeekDB { completed: value.completed, days: [
+            DayDB::from(value.days[0].to_owned()),
+            DayDB::from(value.days[1].to_owned()),
+            DayDB::from(value.days[2].to_owned()),
+            DayDB::from(value.days[3].to_owned()),
+            DayDB::from(value.days[4].to_owned()),
+            DayDB::from(value.days[5].to_owned())
+        ]}
     }
 }
 impl WeekDB {

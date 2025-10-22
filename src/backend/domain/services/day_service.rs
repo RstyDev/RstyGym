@@ -1,29 +1,31 @@
 use crate::backend::domain::repositories::DayRepository;
-use crate::entities::Day;
-use crate::error::AppRes;
+use crate::entities::{Day, Exercise};
+use crate::utils::error::AppRes;
 
 #[derive(Clone)]
 pub struct DayService<T: DayRepository> {
-    book_repo: T,
+    repo: T,
 }
 
 impl <T: DayRepository> DayService<T> {
-    pub fn new(book_repo: T) -> Self {
-        Self{book_repo}
+    pub fn new(repo: T) -> Self {
+        Self{repo}
     }
     pub async fn get_all(&self) -> AppRes<Vec<Day>> {
-        self.book_repo.get_all().await
+        self.repo.get_all().await
     }
     pub async fn get_by_user(&self, user: &str) -> AppRes<Vec<Day>> {
-        self.book_repo.get_by_user(user).await
+        self.repo.get_by_user(user).await
     }
     pub async fn save(&self, day: Day) -> AppRes<()> {
-        self.book_repo.save(day).await
+        self.repo.save(day).await
     }
     pub async fn delete(&self, id: &str) -> AppRes<()> {
-        self.book_repo.delete(id).await
+        self.repo.delete(id).await
     }
     pub async fn update(&self, day: &Day) -> AppRes<Day> {
-        self.book_repo.update(day).await
+        self.repo.update(day).await
     }
+
+    pub async fn update_exercises(&self, id: String, exercises: Vec<Exercise>) -> AppRes<Day> { self.repo.update_exercises(id, exercises).await }
 }

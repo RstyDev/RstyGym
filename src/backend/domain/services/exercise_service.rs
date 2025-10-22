@@ -1,6 +1,6 @@
 use crate::backend::domain::repositories::ExerciseRepository;
 use crate::entities::Exercise;
-use crate::error::AppRes;
+use crate::utils::error::AppRes;
 
 #[derive(Clone)]
 pub struct ExerciseService<T: ExerciseRepository> {

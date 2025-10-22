@@ -1,5 +1,6 @@
 #![allow(async_fn_in_trait)]
-use crate::{entities::Routine, error::AppRes};
+use crate::entities::Routine;
+use crate::utils::error::AppRes;
 
 pub trait RoutineRepository {
     async fn save(&self, routine: Routine) -> AppRes<()>;

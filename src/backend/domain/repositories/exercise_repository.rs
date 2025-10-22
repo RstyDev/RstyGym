@@ -1,5 +1,6 @@
 #![allow(async_fn_in_trait)]
-use crate::{entities::Exercise, error::AppRes};
+use crate::entities::Exercise;
+use crate::utils::error::AppRes;
 
 pub trait ExerciseRepository {
     async fn save(&self, exercise: Exercise) -> AppRes<()>;

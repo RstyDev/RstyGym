@@ -1,4 +1,4 @@
-use crate::backend::infrastructure::db::establish_connection;
+use crate::{backend::infrastructure::db::establish_connection, string};
 use crate::backend::infrastructure::repositories::{SurrealRoutineRepository, SurrealExerciseRepository, SurrealDayRepository};
 use crate::backend::{
     presentation::routes::root_routes,
@@ -17,14 +17,14 @@ pub async fn run() -> std::io::Result<()> {
     let day_repo = SurrealDayRepository::new().await;
     let exercise_repo = SurrealExerciseRepository::new().await;
     let db = establish_connection().await;
-    if env::var(String::from("PREFILL")).unwrap().eq_ignore_ascii_case("true") {
+    if env::var(string!("PREFILL")).unwrap().eq_ignore_ascii_case("true") {
         db.query(r#"
             remove table if exists exercise;
             remove table if exists day;
             remove table if exists routine;
             remove table if exists gym;
         "#).await.unwrap();
-        if let Ok(gym_name) = env::var(String::from("GYM_NAME")) {
+        if let Ok(gym_name) = env::var(string!("GYM_NAME")) {
             db.query(r#"
                 INSERT INTO gym {
                     nombre: $gym_name
@@ -37,8 +37,8 @@ pub async fn run() -> std::io::Result<()> {
     println!("Starting...");
 
     let app = HttpServer::new(move || {
-        let cors = Cors::default().allowed_origin(&env::var(String::from("ORIGIN")).unwrap());
-        let cors = match &env::var(String::from("ORIGIN_SECOND")) {
+        let cors = Cors::default().allowed_origin(&env::var(string!("ORIGIN")).unwrap());
+        let cors = match &env::var(string!("ORIGIN_SECOND")) {
             Ok(var) => cors
                 .allowed_origin(var)
                 .allow_any_method()
@@ -56,7 +56,7 @@ pub async fn run() -> std::io::Result<()> {
             .wrap(cors)
             .configure(|config| root_routes(config))
     })
-        .bind((env::var(String::from("HOST")).expect("HOST not set").as_str(), 8088))?;
+        .bind((env::var(string!("HOST")).expect("HOST not set").as_str(), 8088))?;
     println!("Running!");
     app.run().await
 }

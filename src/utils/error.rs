@@ -1,5 +1,6 @@
 #[cfg(feature = "ssr")]
 use actix_web::{HttpResponse, Responder};
+#[cfg(feature = "ssr")]
 use actix_web::HttpRequest;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -48,5 +49,12 @@ impl AppError{
                 HttpResponse::InternalServerError().json((line,e))
             }
         }
+    }
+}
+
+#[cfg(feature = "ssr")]
+impl From<surrealdb::Error> for AppError {
+    fn from(value: surrealdb::Error) -> Self {
+        AppError::DBErr(59, value.to_string())
     }
 }
