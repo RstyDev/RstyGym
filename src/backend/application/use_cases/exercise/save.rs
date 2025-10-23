@@ -13,7 +13,7 @@ impl<T: ExerciseRepository> SaveExerciseUseCase<T> {
         Self { service }
     }
 
-    pub async fn execute(&self, exercise: Exercise) -> AppRes<()> {
-        self.service.save(exercise).await
+    pub async fn execute(&self, device: String, exercise: Exercise) -> AppRes<()> {
+        self.service.save(device,exercise).await
     }
 }

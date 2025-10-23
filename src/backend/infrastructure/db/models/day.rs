@@ -3,9 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use surrealdb::RecordId;
 use crate::entities::{Day, DayState, Exercise};
-
-
-
+use crate::record_id;
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct DayDB {
@@ -24,7 +22,7 @@ impl From<Day> for DayDB {
 
 impl DayDB {
     pub fn new(id: Option<String>, state: DayState, date: NaiveDate, exercises: Vec<Exercise>) -> Self {
-        let id = id.map(|id|RecordId::from(("days",id)));
+        let id = id.map(|id|record_id!("days",id));
         Self { id, state, date, exercises: exercises.into_iter().map(|ex|ex.record().unwrap()).collect() }
     }
     pub fn build(day: Day) -> Self {

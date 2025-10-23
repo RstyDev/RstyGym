@@ -1,12 +1,8 @@
 use std::sync::Arc;
-use crate::{
-    backend::{
-        domain::repositories::ExerciseRepository,
-        infrastructure::db::{establish_connection, DBPool},
-    },
-    entities::Exercise,
-};
-use crate::backend::infrastructure::db::ExerciseDB;
+use crate::{backend::{
+    domain::repositories::ExerciseRepository,
+    infrastructure::db::{establish_connection, DBPool},
+}, entities::Exercise, exercise_db, record_id};
 use crate::utils::error::{AppError, AppRes};
 
 #[derive(Clone)]
@@ -27,20 +23,22 @@ impl SurrealExerciseRepository {
     series: [Option<Series>; 4],
     group: MuscleGroup,*/
 impl ExerciseRepository for Arc<SurrealExerciseRepository> {
-    async fn save(&self, exercise: Exercise) -> AppRes<()> {
-        let exercise = ExerciseDB::from(exercise);
+    async fn save(&self, device: String, exercise: Exercise) -> AppRes<()> {
+        let exercise = exercise_db!(exercise);
         // let res = self.pool.insert(&exercise).await;
         let res = self
             .pool
             .query(
                 r#"
         insert into exercises {
+            device: $device,
             name: $name,
             series: $series,
             group: $group,
         }
         "#,
             )
+            .bind(("device", record_id!("device",device)))
             .bind(("name", exercise.name().to_owned()))
             .bind(("series", exercise.series().to_owned()))
             .bind(("group",exercise.group()))
@@ -62,7 +60,7 @@ impl ExerciseRepository for Arc<SurrealExerciseRepository> {
         Err(AppError::IndexErr(1))
     }
 
-    async fn get_by_user(&self, id: &str) -> AppRes<Vec<Exercise>> {
+    async fn get_by_device(&self, id: &str) -> AppRes<Vec<Exercise>> {
         Err(AppError::IndexErr(1))
     }
 

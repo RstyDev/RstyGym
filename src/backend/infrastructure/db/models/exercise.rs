@@ -1,6 +1,7 @@
 use serde::{Serialize, Deserialize};
 use surrealdb::RecordId;
 use crate::entities::{Exercise, MuscleGroup, Series};
+use crate::record_id;
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct ExerciseDB {
@@ -19,7 +20,7 @@ impl From<Exercise> for ExerciseDB {
 
 impl ExerciseDB {
     pub fn new(id: Option<String>, name: String, series: [Option<Series>; 4], group: MuscleGroup) -> Self {
-        let id = id.map(|id|RecordId::from(("exercises",id)));
+        let id = id.map(|id|record_id!("exercises",id));
         Self { id, name, series, group }
     }
     pub fn build(exercise: Exercise) -> Self {

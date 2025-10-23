@@ -14,11 +14,11 @@ impl <T: DayRepository> DayService<T> {
     pub async fn get_all(&self) -> AppRes<Vec<Day>> {
         self.repo.get_all().await
     }
-    pub async fn get_by_user(&self, user: &str) -> AppRes<Vec<Day>> {
-        self.repo.get_by_user(user).await
+    pub async fn get_by_device(&self, device: &str) -> AppRes<Vec<Day>> {
+        self.repo.get_by_device(device).await
     }
-    pub async fn save(&self, day: Day) -> AppRes<()> {
-        self.repo.save(day).await
+    pub async fn save(&self, device: String, day: Day) -> AppRes<()> {
+        self.repo.save(device,day).await
     }
     pub async fn delete(&self, id: &str) -> AppRes<()> {
         self.repo.delete(id).await

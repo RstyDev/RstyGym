@@ -13,7 +13,7 @@ impl<T: RoutineRepository> SaveRoutineUseCase<T> {
         Self { service }
     }
 
-    pub async fn execute(&self, routine: Routine) -> AppRes<()> {
-        self.service.save(routine).await
+    pub async fn execute(&self, device: String, routine: Routine) -> AppRes<()> {
+        self.service.save(device,routine).await
     }
 }

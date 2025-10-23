@@ -13,7 +13,7 @@ impl<T: DayRepository> SaveDayUseCase<T> {
         Self { service }
     }
 
-    pub async fn execute(&self, day: Day) -> AppRes<()> {
-        self.service.save(day).await
+    pub async fn execute(&self, device: String, day: Day) -> AppRes<()> {
+        self.service.save(device,day).await
     }
 }

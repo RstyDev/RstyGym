@@ -1,0 +1,31 @@
+@Host = http://localhost:8088
+@Auth = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3NjEyNDkxMTYsImlhdCI6MTc2MTI0OTExNiwiZXhwIjoxNzYxMjQ5NDE2LCJ0aXBvIjoiTm9ybWFsIiwiaWQiOiJsMmNoYzkwa3Z6NTlnbWZ1ZW5xNiJ9.CSK4UGF6ev5qfKMdKZMvaTEdxc4qbfRWcxilG_VKjTo
+@Id = s7wqlxg8tv2eneopto42
+
+###
+#Get all days
+GET {{Host}}/days/
+Content-Type: application/json
+Authorization: Bearer {{Auth}}
+
+###
+#Post day
+POST {{Host}}/days/
+Content-Type: application/json
+Authorization: Bearer {{Auth}}
+
+{
+  "device": "l2chc90kvz59gmfuenq6",
+  "id": null,
+  "state": "Free",
+  "date": "2025-10-22",
+  "exercises": []
+}
+
+###
+#Update Exercises
+PUT {{Host}}/days/{{Id}}
+Content-Type: application/json
+Authorization: Bearer {{Auth}}
+
+[]

@@ -2,13 +2,14 @@ use actix_web::{post, get, put, HttpResponse, Responder};
 use actix_web::web::{Data, Json, Path};
 use chrono::Local;
 use crate::{entities::Day, backend::{application::use_cases::day::*, infrastructure::repositories::SurrealDayRepository}};
-use crate::entities::{DayState, Exercise};
+use crate::entities::{DayDTO, DayState, Exercise};
 
 #[post("/")]
-pub async fn save_day(repo: Data<SurrealDayRepository>, day: Json<Day>) -> impl Responder {
+pub async fn save_day(repo: Data<SurrealDayRepository>, day: Json<DayDTO>) -> impl Responder {
 
     let day = day.into_inner();
-    match SaveDayUseCase::new(repo.into_inner()).execute(day).await {
+    let (device,day) = day.into_inner();
+    match SaveDayUseCase::new(repo.into_inner()).execute(device,day).await {
         Ok(_) => HttpResponse::Created().finish(),
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
     }

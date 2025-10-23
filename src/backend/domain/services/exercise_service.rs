@@ -15,11 +15,11 @@ impl <T: ExerciseRepository> ExerciseService<T> {
         self.book_repo.get_all().await
     }
 
-    pub async fn get_by_user(&self, user: &str) -> AppRes<Vec<Exercise>> {
-        self.book_repo.get_by_user(user).await
+    pub async fn get_by_device(&self, device: &str) -> AppRes<Vec<Exercise>> {
+        self.book_repo.get_by_device(device).await
     }
-    pub async fn save(&self, exercise: Exercise) -> AppRes<()> {
-        self.book_repo.save(exercise).await
+    pub async fn save(&self, device: String, exercise: Exercise) -> AppRes<()> {
+        self.book_repo.save(device,exercise).await
     }
     pub async fn delete(&self, id: &str) -> AppRes<()> {
         self.book_repo.delete(id).await

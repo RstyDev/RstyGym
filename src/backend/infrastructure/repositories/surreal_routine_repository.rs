@@ -1,10 +1,7 @@
-use crate::{
-    backend::{
-        domain::repositories::RoutineRepository,
-        infrastructure::db::{establish_connection, DBPool},
-    },
-    entities::Routine,
-};
+use crate::{backend::{
+    domain::repositories::RoutineRepository,
+    infrastructure::db::{establish_connection, DBPool},
+}, entities::Routine, record_id};
 use crate::backend::infrastructure::db::RoutineDB;
 use std::sync::Arc;
 use surrealdb::RecordId;
@@ -33,7 +30,7 @@ impl SurrealRoutineRepository {
     created_by: String,
     created_at: NaiveDate,*/
 impl RoutineRepository for Arc<SurrealRoutineRepository> {
-    async fn save(&self, routine: Routine) -> AppRes<()> {
+    async fn save(&self, device: String, routine: Routine) -> AppRes<()> {
         let routine: RoutineDB = routine.into();
         // let routine = RoutineDB::from(routine);
         let templates = routine.templates().into_iter().map(|DayTemplate(ex)|{
@@ -45,6 +42,7 @@ impl RoutineRepository for Arc<SurrealRoutineRepository> {
             .query(
                 r#"
         insert into routines {
+            device: $device,
             templates: $templates,
             week: $week,
             last_check_in: $last_check_in,
@@ -54,6 +52,7 @@ impl RoutineRepository for Arc<SurrealRoutineRepository> {
         }
         "#,
             )
+            .bind(("device",record_id!("device",device)))
             .bind(("templates", templates))
             .bind(("week", routine.weeks().to_owned()))
             .bind(("last_check_in",routine.last_check_in()))
@@ -78,7 +77,7 @@ impl RoutineRepository for Arc<SurrealRoutineRepository> {
         Err(AppError::IndexErr(1))
     }
 
-    async fn get_by_user(&self, id: &str) -> AppRes<Vec<Routine>> {
+    async fn get_by_device(&self, id: &str) -> AppRes<Vec<Routine>> {
         Err(AppError::IndexErr(1))
     }
 

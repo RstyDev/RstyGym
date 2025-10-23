@@ -47,8 +47,7 @@ impl Routine {
     pub fn new(id: Option<String>, templates: Vec<DayTemplate>, weeks: [Week; 4], last_check_in: NaiveDate, last_day: NaiveDate, created_by: String, created_at: NaiveDate) -> Self {
         Self { id, templates, weeks, last_check_in, last_day, created_by, created_at }
     }
-    pub fn from_templates(new_routine: NewRoutineDTO) -> Self {
-        let templates = new_routine.templates;
+    pub fn from_templates(created_by: String, templates: Vec<DayTemplate>) -> Self {
         let today = Local::now().date_naive();
         let minus_days = match today.weekday() {
             Weekday::Mon => 0,
@@ -72,7 +71,7 @@ impl Routine {
             ],
             last_check_in: NaiveDate::MIN,
             last_day: Default::default(),
-            created_by: new_routine.created_by,
+            created_by,
             created_at: today,
         }
     }

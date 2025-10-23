@@ -2,6 +2,7 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use surrealdb::RecordId;
 use crate::backend::infrastructure::db::DayDB;
+use crate::{day_db, record_id};
 use crate::entities::{Day, DayTemplate, Exercise, Routine, Week};
 
 
@@ -31,12 +32,12 @@ pub struct WeekDB {
 impl From<Week> for WeekDB {
     fn from(value: Week) -> Self {
         WeekDB { completed: value.completed, days: [
-            DayDB::from(value.days[0].to_owned()),
-            DayDB::from(value.days[1].to_owned()),
-            DayDB::from(value.days[2].to_owned()),
-            DayDB::from(value.days[3].to_owned()),
-            DayDB::from(value.days[4].to_owned()),
-            DayDB::from(value.days[5].to_owned())
+            day_db!(value.days[0].to_owned()),
+            day_db!(value.days[1].to_owned()),
+            day_db!(value.days[2].to_owned()),
+            day_db!(value.days[3].to_owned()),
+            day_db!(value.days[4].to_owned()),
+            day_db!(value.days[5].to_owned())
         ]}
     }
 }
@@ -52,7 +53,7 @@ impl WeekDB {
 
 impl RoutineDB {
     pub fn new(id: Option<String>, templates: Vec<DayTemplate>, weeks: [Week; 4], last_check_in: NaiveDate, last_day: NaiveDate, created_by: String, created_at: NaiveDate) -> Self {
-        let id = id.map(|id|RecordId::from(("routines",id)));
+        let id = id.map(|id|record_id!("routines",id));
         let weeks = [weeks[0].to_owned().into(),weeks[1].to_owned().into(),weeks[2].to_owned().into(),weeks[3].to_owned().into()];
         Self { id, templates, weeks, last_check_in, last_day, created_by, created_at }
     }

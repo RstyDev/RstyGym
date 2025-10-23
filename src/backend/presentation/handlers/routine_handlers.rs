@@ -8,8 +8,14 @@ use crate::entities::{DayTemplate, Exercise, MuscleGroup, NewRoutineDTO, Routine
 pub async fn save_routine(repo: Data<SurrealRoutineRepository>, days: Json<NewRoutineDTO>) -> impl Responder {
 
     let days = days.into_inner();
-    let routine = Routine::from_templates(days);
-    match SaveRoutineUseCase::new(repo.into_inner()).execute(routine).await {
+
+    let NewRoutineDTO {
+        device,
+        created_by,
+        templates
+    } = days;
+    let routine = Routine::from_templates(created_by,templates);
+    match SaveRoutineUseCase::new(repo.into_inner()).execute(device,routine).await {
         Ok(_) => HttpResponse::Created().finish(),
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
     }
