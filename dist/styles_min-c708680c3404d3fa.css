@@ -5,6 +5,10 @@
 #new_device_form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 50px;
     margin: 20px;
+}
+
+.button, input{
+    padding: 20px;
 }

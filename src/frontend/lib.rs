@@ -6,7 +6,7 @@ use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
-use std::sync::{Arc, LazyLock, Mutex};
+use std::sync::LazyLock;
 use sycamore::prelude::Signal;
 use sycamore::prelude::*;
 use web_sys::HtmlDocument;

@@ -3,7 +3,6 @@ use async_std::task::block_on;
 use reqwest::{Method, StatusCode};
 use sycamore::prelude::*;
 use crate::{string, frontend::{structs::{Auth, Tabs},pages::Login, lib::{rfc_7231, HOST, document}}, entities::{LoginResult, RefreshResult}, utils::error::AppError};
-use wasm_bindgen::JsCast;
 
 
 #[component]
@@ -25,8 +24,7 @@ pub fn App() -> View {
 
     match html_document.cookie().unwrap().split("device=").nth(1) {
         Some(part1) => {
-            let device = part1.split(";").nth(0).unwrap();
-            if let Some(device) = part1.split(";").nth(0) {
+            if let Some(_) = part1.split(";").nth(0) {
                 block_on(async move {
                     match html2.cookie().unwrap().split("refresh=").nth(1) {
                         Some(first_part) => {
@@ -97,7 +95,7 @@ pub fn App() -> View {
     view!{
         div(class="app") {
             (match auth.get_clone() {
-                Auth::Logged(tokens) => {
+                Auth::Logged(_) => {
                     let html = html.to_owned();
                     view!{
                         (match tab.get(){
