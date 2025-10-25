@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use surrealdb::RecordId;
 #[cfg(feature = "ssr")]
 use crate::backend::infrastructure::db::RoutineDB;
-use crate::entities::{Day, DayState, Exercise, NewRoutineDTO};
+use crate::entities::{Day, DayState, Exercise};
 
 
 

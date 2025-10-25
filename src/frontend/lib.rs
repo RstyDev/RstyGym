@@ -6,13 +6,22 @@ use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
-use std::sync::LazyLock;
+use std::sync::{Arc, LazyLock, Mutex};
 use sycamore::prelude::Signal;
 use sycamore::prelude::*;
+use web_sys::HtmlDocument;
+use wasm_bindgen::JsCast;
+
 
 const NAME: &'static str = "Lib";
 
 pub static HOST: LazyLock<String> = LazyLock::new(|| std::env!("BACKEND").to_string());
+
+
+
+pub fn document() -> HtmlDocument {
+    web_sys::window().unwrap().document().unwrap().dyn_into::<web_sys::HtmlDocument>().unwrap()
+}
 
 //const HOST: &str = "http://localhost:8088/";
 
