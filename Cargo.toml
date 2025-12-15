@@ -1,0 +1,42 @@
+[package]
+name = "rsty_gym"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+#SSR
+actix-cors = { version = "0.7.0", optional = true }
+actix-web = { version = "4.9.0", optional = true }
+actix-web-httpauth = { version = "0.8.2", optional = true }
+actix-ws = { version = "0.3.0", optional = true }
+surrealdb = { version = "2.2.2", optional = true }
+jsonwebtoken = { version = "9.3.1", optional = true }
+
+
+#Both
+dotenv = { version = "0.15.0", optional = false }
+chrono = {version= "0.4.40" ,features = ["serde"] }
+serde = { version = "1.0.219", features = ["derive"] }
+thiserror = { version = "2.0.12", features = ["default"] }
+async-std = { version = "1.13.0", optional = false }
+
+#CSR
+sycamore = { version = "0.9.1", features = ["suspense"], optional = true }
+wasm-bindgen = { version = "0.2.100", optional = true }
+wasm-bindgen-futures = { version = "0.4.50", optional = true }
+serde-wasm-bindgen = { version = "0.6.5", optional = true }
+console_error_panic_hook = { version = "0.1.7", optional = true }
+reqwest = { version = "0.12", features = ["json"], optional = true }
+web-sys = { version = "0.3.77", optional = true, features = ["WebSocket", 'Window', 'Document', 'HtmlDocument'] }
+log = "0.4.28"
+
+
+
+
+[features]
+ssr = ["dep:actix-cors", "dep:actix-web", "dep:actix-ws", "dep:surrealdb", "dep:actix-web-httpauth", "dep:jsonwebtoken",
+    #    , "dep:shuttle-actix-web", "dep:shuttle-runtime" ,"dep:dotenv", "dep:async-trait"
+]
+csr = ["dep:wasm-bindgen", "dep:sycamore", "dep:wasm-bindgen-futures", "dep:serde-wasm-bindgen",
+    #"dep:async-std",
+    "dep:console_error_panic_hook", "dep:reqwest", "dep:web-sys"]
