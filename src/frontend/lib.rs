@@ -18,7 +18,6 @@ const NAME: &'static str = "Lib";
 pub static HOST: LazyLock<String> = LazyLock::new(|| std::env!("BACKEND").to_string());
 
 
-
 pub fn document() -> HtmlDocument {
     web_sys::window().unwrap().document().unwrap().dyn_into::<web_sys::HtmlDocument>().unwrap()
 }
